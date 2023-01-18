@@ -1,0 +1,23 @@
+{% extends 'start.html' %}
+{% block css %}
+    <link rel="stylesheet" href="../../static/base.css">
+    <link rel="stylesheet" href="../../static/w3.css">
+{% endblock %}
+{% block content %}
+    <form method="post">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <input type="submit" value="Szukaj">
+    </form>
+    {% if results %}
+        <h3>Wyniki:</h3>
+        <ul>
+            {% for result in results %}
+            <li class="w3-bar-block w3-border-green">{% for field in result %}{{ field }} {% endfor %}</li>
+            {%  endfor %}
+        </ul>
+    {% endif %}
+{#    <label for="site-search">Wyszukaj {{ model }}:</label>#}
+{#    <input type="search" id="site-search" name="q">#}
+{#    <button>Wyszukaj</button>#}
+{% endblock %}

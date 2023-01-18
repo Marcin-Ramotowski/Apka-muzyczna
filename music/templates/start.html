@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplikacja Muza na luzie</title>
+    {% block css %}
+    <link rel="stylesheet" href="../static/base.css">
+    <link rel="stylesheet" href="../static/w3.css">
+    {% endblock %}
+</head>
+<body>
+{% for message in messages %}
+    <div class="w3-panel w3-green">{{ message }}</div>
+{% endfor %}
+{% block content %}
+    <div class="w3-container w3-white">
+        <a class="w3-button w3-light-green w3-right" href="{% url 'login' %}">
+            Zaloguj się
+        </a>
+        <h2>Cześć,</h2>
+        <p class="w3-text-black" style="font-size: 14px">witaj w aplikacji "Muza na luzie" - nowym serwisie muzycznym
+            tworzonym z pasją, prezentującym muzykę w luźnym stylu. Aby rozpocząć przygodę, zaloguj się</p>
+</div>
+</body>
+{%  endblock %}
+</html>
