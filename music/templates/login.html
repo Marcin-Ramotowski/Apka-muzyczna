@@ -1,18 +1,21 @@
-{% extends 'start.html' %}
-{% block css %}
-    <link rel="stylesheet" type="text/css" href="../static/base.css">
-    <link rel="stylesheet" type="text/css" href="../static/w3.css">
-{% endblock %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplikacja Muza na luzie</title>
+    <link rel="stylesheet" href="../static/base.css">
+    <link rel="stylesheet" href="../static/w3.css">
+</head>
 <body>
-{#<h1 class="w3-display-topmiddle">Zaloguj się</h1>#}
+{% for message in messages %}
+    <div class="w3-panel w3-green">{{ message }}</div>
+{% endfor %}
+{% block content %}
 <form class="middle_form" action="{% url 'login' %}" method="post">
     <h2>Zaloguj się</h2>
     <div>{{ form.as_p }}</div>
     {% csrf_token %}
-    {% if error %}
-        <div class="w3-text-red">{{ error }}</div>
-    {% endif %}
+    <p class="text-center">Nie masz u nas konta? <a href="{% url 'register' %}">Zarejestruj się</a>.</p>
     <input type="submit" value="Zaloguj się">
 </form>
 </body>

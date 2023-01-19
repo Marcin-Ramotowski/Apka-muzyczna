@@ -12,14 +12,23 @@
 {% for message in messages %}
     <div class="w3-panel w3-green">{{ message }}</div>
 {% endfor %}
+<div class="w3-container w3-white">
+{% if user.is_authenticated %}
+    <a class="w3-button w3-red w3-right" href="{% url 'logout' %}">
+    Wyloguj się
+    </a>
+{% else %}
+    <a class="w3-button w3-light-green w3-right" href="{% url 'login' %}">
+        Zaloguj się
+    </a>
+    <a class="w3-button w3-light-blue w3-right" href="{% url 'register' %}">
+        Zarejestruj się
+    </a>
+{% endif %}
 {% block content %}
-    <div class="w3-container w3-white">
-        <a class="w3-button w3-light-green w3-right" href="{% url 'login' %}">
-            Zaloguj się
-        </a>
-        <h2>Cześć,</h2>
-        <p class="w3-text-black" style="font-size: 14px">witaj w aplikacji "Muza na luzie" - nowym serwisie muzycznym
-            tworzonym z pasją, prezentującym muzykę w luźnym stylu. Aby rozpocząć przygodę, zaloguj się</p>
+    <h2>Cześć,</h2>
+    <p class="w3-text-black">witaj w aplikacji "Muza na luzie" - nowym serwisie muzycznym
+        tworzonym z pasją, prezentującym muzykę w luźnym stylu. Aby rozpocząć przygodę, zaloguj się</p>
 </div>
 </body>
 {%  endblock %}

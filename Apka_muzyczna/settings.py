@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'music.apps.MainConfig'
+    'music.apps.MainConfig',
+    'crispy_forms'
 ]
 
 MIDDLEWARE = [
@@ -123,5 +124,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = "../../music/profile/"
-LOGOUT_REDIRECT_URL = "../music"
+LOGIN_REDIRECT_URL = "../../profile/"
+LOGOUT_REDIRECT_URL = "../"

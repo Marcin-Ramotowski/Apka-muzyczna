@@ -8,12 +8,7 @@ load_dotenv()
 
 LOGIN = os.getenv("DB_USERNAME")
 PASSWORD = os.getenv("DB_PASSWORD")
-# HOST = os.getenv("DB_HOST")
-# PORT = os.getenv("DB_PORT")
 DATABASE = os.getenv("DB_NAME")
-# JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-# SECRET_KEY = os.getenv("SECRET_KEY")
-CIPHER_METHOD = os.getenv("PW_METHOD")
 
 
 def main():

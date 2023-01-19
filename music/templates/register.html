@@ -1,0 +1,16 @@
+{% extends 'login.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+<!--Rejestracja-->
+<div class="container py-5">
+	<h1>Zarejestruj się</h1>
+	<form method="POST">
+		{% csrf_token %}
+		{{ form|crispy }}
+		<button class="btn btn-primary" type="submit">Zarejestruj</button>
+	</form>
+	<p class="text-center">Jeśli masz już konto, <a href="/login">zaloguj się</a>.</p>
+</div>
+
+{% endblock %}
