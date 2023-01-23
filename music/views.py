@@ -4,8 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect
 from django.views.generic import FormView
+from django.http import StreamingHttpResponse
 from .forms import SearchForm, RegisterForm
 from .models import Autor, Utwor, Album, Playlista
+import mimetypes
 
 
 def start(request):
@@ -15,6 +17,17 @@ def start(request):
 @login_required
 def profile(request):
     return render(request, 'profile.html', {'username': request.user})
+
+
+def download_file(request):
+    fl_path = 'music/static/media/CLEO - Kocham.mp3'
+    filename = 'CLEO - Kocham.mp3'
+
+    fl = open(fl_path, 'rb')
+    mime_type = mimetypes.guess_type(fl_path)[0]
+    response = StreamingHttpResponse(fl, content_type=mime_type)
+    response['Content-Disposition'] = f"attachment; filename={filename}"
+    return response
 
 
 class BaseLoginView(LoginView):

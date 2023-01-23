@@ -26,11 +26,11 @@ class Utwor(models.Model):
     class Meta:
         db_table = "utwor"
     utwor_id = models.IntegerField(primary_key=True)
-    autor_id = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='songs')
-    album_id = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='songs')
+    autor_id = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='songs_by_autor')
+    album_id = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='songs_in_album')
     tytul = models.CharField(max_length=60)
     gatunek = models.CharField(max_length=30)
-    dlugosc = models.TimeField()
+    dlugosc = models.DurationField()
 
 
 class Uzytkownik(models.Model):
@@ -58,12 +58,12 @@ class Playlista(models.Model):
 class PlaylistaUtwor(models.Model):
     class Meta:
         db_table = "playlista_utwor"
-    playlista_id = models.ForeignKey(Playlista, on_delete=models.CASCADE, related_name='playlists_songs')
-    utwor_id = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='playlists_songs')
+    playlista_id = models.ForeignKey(Playlista, on_delete=models.CASCADE, related_name='playlistSongs_playlists')
+    utwor_id = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='playlistSongs_songs')
 
 
 class Subskrypcja(models.Model):
     class Meta:
         db_table = "subskrypcja"
-    uzytkownik_id = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='subscriptions')
-    autor_id = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='subscriptions')
+    uzytkownik_id = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='subscriptions_user')
+    autor_id = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='subscriptions_author')
