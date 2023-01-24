@@ -26,3 +26,9 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'username', 'email', 'password1', 'password2')
+
+
+class UploadForm(forms.Form):
+    title = forms.CharField(max_length=30, label='Tytuł')
+    genre = forms.CharField(max_length=20, label='Gatunek')
+    file = forms.FileField(widget=forms.ClearableFileInput)

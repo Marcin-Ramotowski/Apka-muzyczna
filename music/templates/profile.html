@@ -8,10 +8,9 @@
         <p class="w3-text-black">Witaj, {{ username }}</p>
             <p class="w3-text-black" style="font-size: 14px">Zapraszam Cię do świata ekscytujących doznań słuchowych,
                 w którym odprężysz się przy dźwiękach swoich ulubionych utworów. :)</p>
-        <h2>Biblioteka:</h2>
-        <p>Pobierz przykładowy plik:</p>
-        <a href="{% url 'music:download' %}">Obrazek</a>
-
+        <a class="w3-orange w3-button" href="{% url 'music:upload' %}">Dodaj muzę</a>
+        <a class="w3-purple w3-button" href="{% url 'music:download' %}">Pobierz muzę</a>
+        <a class="w3-blue w3-button" href="{% url 'music:search' %}">Szukaj</a>
 </div>
 </body>
 {% endblock %}

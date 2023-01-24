@@ -28,7 +28,12 @@
 {% block content %}
     <h2>Cześć,</h2>
     <p class="w3-text-black">witaj w aplikacji "Muza na luzie" - nowym serwisie muzycznym
-        tworzonym z pasją, prezentującym muzykę w luźnym stylu. Aby rozpocząć przygodę, zaloguj się</p>
+        tworzonym z pasją, prezentującym muzykę w luźnym stylu.</p>
+    {% if user.is_authenticated %}
+        <a class="w3-yellow w3-button" href="{% url 'music:profile' %}">Twój profil</a>
+    {% else %}
+        <p>Aby rozpocząć przygodę, zaloguj się</p>
+    {% endif %}
 </div>
 </body>
 {%  endblock %}
