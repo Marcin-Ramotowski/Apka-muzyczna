@@ -13,7 +13,7 @@
         <h3>Wyniki:</h3>
         <ul>
             {% for result in results %}
-            <li class="w3-bar-block w3-border-green">{% for field in result %}{{ field }} {% endfor %}</li>
+            <li class="w3-bar-block w3-border-green">{{ result }}</li>
             {%  endfor %}
         </ul>
     {% endif %}

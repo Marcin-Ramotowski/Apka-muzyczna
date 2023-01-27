@@ -14,7 +14,7 @@ def start(request):
     return render(request, 'start.html')
 
 
-@login_required
+@login_required(login_url='/login')
 def profile(request):
     return render(request, 'profile.html', {'username': request.user})
 
@@ -64,15 +64,14 @@ class SearchFormView(FormView):
 
     def post(self, request, *args, **kwargs):
         models = {'autor': Autor, 'piosenka': Utwor, 'album': Album, 'playlista': Playlista}
-        filter_fields = {'autor': ('imie', 'nazwisko'), 'piosenka': ('tytul', 'gatunek'),
-                         'album': ('tytul', 'rok_wydania'), 'playlista': ('nazwa',)}
+        filter_fields = {'autor': 'imie', 'piosenka': 'tytul',
+                         'album': 'tytul', 'playlista': 'nazwa'}
         form = self.form_class(request.POST)
         query = form.data['query']
-        database_sign = form.data['database']
-        database = models[database_sign]
-        fields = filter_fields[database_sign]
-        results = database.objects.filter(**{fields[0]: query})
-        results = results.values_list(*fields)
+        database_sign = form.data['database']  # pobieramy wybraną przez użytkownika tabelę
+        database = models[database_sign]  # pobieramy klasę reprezentującą wybraną tabelę
+        field = filter_fields[database_sign]  # wybieramy pole, po którym filtrujemy
+        results = database.objects.filter(**{field: query})  # filtrujemy po wybranym polu dopasowując do query
         return render(request, self.template_name, {'form': form, 'results': results})
 
 
