@@ -1,8 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse
 from .forms import SearchForm, RegisterForm, UploadForm
@@ -17,15 +18,26 @@ def start(request):
 @login_required(login_url='/login')
 def profile(request):
     username = request.user
-    return render(request, 'profile.html', {'username': username, 'songs': (), 'authors': (),
-                                            'albums': (), 'playlists': ()})
+    user_id = request.user.id
+
+    songs_ids = BibliotekaPiosenek.objects.filter(uzytkownik_id=user_id)
+    songs = [get_object_or_404(Utwor, utwor_id=record.utwor_id) for record in songs_ids]
+
+    authors_ids = Subskrypcja.objects.filter(uzytkownik_id=user_id)
+    authors = [get_object_or_404(Autor, autor_id=record.autor_id) for record in authors_ids]
+
+    albums_ids = BibliotekaAlbumow.objects.filter(uzytkownik_id=user_id)
+    albums = [get_object_or_404(Album, album_id=record.album_id) for record in albums_ids]
+
+    # playlists_ids = BibliotekaPlaylist.objects.filter(uzytkownik_id=user_id)
+    # playlists = [get_object_or_404(Playlista, playlista_id=record.playlista_id) for record in playlists_ids]
+    return render(request, 'profile.html', {'username': username, 'songs': songs, 'authors': authors,
+                                            'albums': albums, 'playlists': ()})
 
 
+@login_required(login_url='/login')
 def download_file(request, filename):
-    # filename = 'CLEO - Kocham.mp3'
-    # fl_path = 'music/static/media/CLEO - Kocham.mp3'
     fl_path = 'music/static/media/' + filename
-
     fl = open(fl_path, 'rb')
     mime_type = mimetypes.guess_type(fl_path)[0]
     response = StreamingHttpResponse(fl, content_type=mime_type)
@@ -33,7 +45,7 @@ def download_file(request, filename):
     return response
 
 
-class UploadView(FormView):
+class UploadView(FormView, LoginRequiredMixin):
     template_name = 'upload.html'
     form_class = UploadForm
 
@@ -57,18 +69,18 @@ class BaseLoginView(LoginView):
     template_name = 'login.html'
 
 
-class BaseLogoutView(LogoutView):
+class BaseLogoutView(LogoutView, LoginRequiredMixin):
     template_name = 'start.html'
 
 
-class SearchFormView(FormView):
+class SearchFormView(FormView, LoginRequiredMixin):
     template_name = 'search.html'
     form_class = SearchForm
 
     def post(self, request, *args, **kwargs):
         models = {'autor': Autor, 'piosenka': Utwor, 'album': Album, 'playlista': Playlista}
-        filter_fields = {'autor': 'imie', 'piosenka': 'tytul',
-                         'album': 'tytul', 'playlista': 'nazwa'}
+        filter_fields = {'autor': 'imie__contains', 'piosenka': 'tytul__contains',
+                         'album': 'tytul__contains', 'playlista': 'nazwa__contains'}
         form = self.form_class(request.POST)
         query = form.data['query']
         database_sign = form.data['database']  # pobieramy wybraną przez użytkownika tabelę

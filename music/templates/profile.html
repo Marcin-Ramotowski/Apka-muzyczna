@@ -15,19 +15,21 @@
         <h2>Biblioteka</h2>
         <h3>Ulubione piosenki:</h3>
         {% for song in songs %}
-            <div class="w3-panel w3-light-gray">{{ song }}
+            <div class="w3-panel" style="background-color: #DDDDDD">{{ song }}
+            <a class="w3-purple w3-button" style="margin-left: 20px" href="{{ result.get_url }}">Pobierz</a>
+            </div>
         {% endfor %}
         <h3>Ulubieni artyści:</h3>
         {% for author in authors %}
-            <div class="w3-panel w3-light-gray">{{ author }}
+            <div class="w3-panel" style="background-color: #DDDDDD">{{ author }}</div>
         {% endfor %}
         <h3>Ulubione albumy:</h3>
         {% for album in albums %}
-            <div class="w3-panel w3-light-gray">{{ album }}
+            <div class="w3-panel" style="background-color: #DDDDDD">{{ album }}</div>
         {% endfor %}
         <h3>Ulubione playlisty:</h3>
         {% for playlist in playlists %}
-            <div class="w3-panel w3-light-gray">{{ playlist }}
+            <div class="w3-panel" style="background-color: #DDDDDD">{{ playlist }}</div>
         {% endfor %}
     {% endif %}
 </div>
