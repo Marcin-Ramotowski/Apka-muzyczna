@@ -1,10 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 
 class Autor(models.Model):
     class Meta:
         db_table = "autor"
+
     autor_id = models.IntegerField(primary_key=True)
     imie = models.CharField(max_length=30)
     nazwisko = models.CharField(max_length=50)
@@ -19,8 +21,9 @@ class Autor(models.Model):
 class Album(models.Model):
     class Meta:
         db_table = "album"
+
     album_id = models.IntegerField(primary_key=True)
-    autor = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='albums')
+    autor = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='albums_by_autor')
     tytul = models.CharField(max_length=50)
     rok_wydania = models.SmallIntegerField()
     wiecej_info = models.TextField()
@@ -33,12 +36,17 @@ class Album(models.Model):
 class Utwor(models.Model):
     class Meta:
         db_table = "utwor"
+
     utwor_id = models.IntegerField(primary_key=True)
     autor = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='songs_by_autor')
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='songs_in_album')
     tytul = models.CharField(max_length=60)
     gatunek = models.CharField(max_length=30)
     dlugosc = models.TimeField()
+    plik_sciezka = models.CharField(max_length=60)
+
+    def get_url(self):
+        return reverse('music:download', args=[self.plik_sciezka])
 
     def __str__(self):
         autor = Autor.objects.filter(autor_id=self.autor_id).first()
@@ -49,6 +57,7 @@ class Utwor(models.Model):
 class Uzytkownik(models.Model):
     class Meta:
         db_table = "uzytkownik"
+
     ACCOUNTS_TYPES = (
         ('FR', 'free'),
         ('PR', 'premium')
@@ -66,6 +75,7 @@ class Uzytkownik(models.Model):
 class Playlista(models.Model):
     class Meta:
         db_table = "playlista"
+
     playlista_id = models.IntegerField(primary_key=True)
     uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='playlists')
     nazwa = models.CharField(max_length=100)
@@ -75,15 +85,35 @@ class Playlista(models.Model):
         return f'{self.nazwa} {user}'
 
 
-class PlaylistaUtwor(models.Model):
+class BibliotekaPlaylist(models.Model):
     class Meta:
         db_table = "playlista_utwor"
-    playlista = models.ForeignKey(Playlista, on_delete=models.CASCADE, related_name='playlistSongs_playlists')
-    utwor = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='playlistSongs_songs')
+
+    playlista = models.ForeignKey(Playlista, on_delete=models.CASCADE, related_name='songs_in_playlist')
+    utwor = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='playlists_with_song')
 
 
 class Subskrypcja(models.Model):
     class Meta:
         db_table = "subskrypcja"
+
     uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='subscriptions_user')
     autor = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='subscriptions_author')
+
+
+class BibliotekaPiosenek(models.Model):
+    class Meta:
+        db_table = 'biblioteka_piosenki'
+
+    libsong_id = models.IntegerField(primary_key=True)
+    utwor = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='songs_in_library')
+    uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_song_library')
+
+
+class BibliotekaAlbumow(models.Model):
+    class Meta:
+        db_table = 'biblioteka_albumy'
+
+    libalbum_id = models.IntegerField(primary_key=True)
+    album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='albums_in_library')
+    uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_album_library')

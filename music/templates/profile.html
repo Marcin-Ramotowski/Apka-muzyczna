@@ -5,12 +5,31 @@
 {% endblock %}
 {% block content %}
 <body>
+    {% if user.is_authenticated %}
         <p class="w3-text-black">Witaj, {{ username }}</p>
             <p class="w3-text-black" style="font-size: 14px">Zapraszam Cię do świata ekscytujących doznań słuchowych,
                 w którym odprężysz się przy dźwiękach swoich ulubionych utworów. :)</p>
         <a class="w3-orange w3-button" href="{% url 'music:upload' %}">Dodaj muzę</a>
-        <a class="w3-purple w3-button" href="{% url 'music:download' %}">Pobierz muzę</a>
         <a class="w3-blue w3-button" href="{% url 'music:search' %}">Szukaj</a>
+
+        <h2>Biblioteka</h2>
+        <h3>Ulubione piosenki:</h3>
+        {% for song in songs %}
+            <div class="w3-panel w3-light-gray">{{ song }}
+        {% endfor %}
+        <h3>Ulubieni artyści:</h3>
+        {% for author in authors %}
+            <div class="w3-panel w3-light-gray">{{ author }}
+        {% endfor %}
+        <h3>Ulubione albumy:</h3>
+        {% for album in albums %}
+            <div class="w3-panel w3-light-gray">{{ album }}
+        {% endfor %}
+        <h3>Ulubione playlisty:</h3>
+        {% for playlist in playlists %}
+            <div class="w3-panel w3-light-gray">{{ playlist }}
+        {% endfor %}
+    {% endif %}
 </div>
 </body>
 {% endblock %}

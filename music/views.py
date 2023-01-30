@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse
 from .forms import SearchForm, RegisterForm, UploadForm
-from .models import Autor, Utwor, Album, Playlista
+from .models import *
 import mimetypes
 
 
@@ -16,12 +16,15 @@ def start(request):
 
 @login_required(login_url='/login')
 def profile(request):
-    return render(request, 'profile.html', {'username': request.user})
+    username = request.user
+    return render(request, 'profile.html', {'username': username, 'songs': (), 'authors': (),
+                                            'albums': (), 'playlists': ()})
 
 
-def download_file(request):
-    fl_path = 'music/static/media/CLEO - Kocham.mp3'
-    filename = 'CLEO - Kocham.mp3'
+def download_file(request, filename):
+    # filename = 'CLEO - Kocham.mp3'
+    # fl_path = 'music/static/media/CLEO - Kocham.mp3'
+    fl_path = 'music/static/media/' + filename
 
     fl = open(fl_path, 'rb')
     mime_type = mimetypes.guess_type(fl_path)[0]
@@ -72,7 +75,7 @@ class SearchFormView(FormView):
         database = models[database_sign]  # pobieramy klasę reprezentującą wybraną tabelę
         field = filter_fields[database_sign]  # wybieramy pole, po którym filtrujemy
         results = database.objects.filter(**{field: query})  # filtrujemy po wybranym polu dopasowując do query
-        return render(request, self.template_name, {'form': form, 'results': results})
+        return render(request, self.template_name, {'form': form, 'results': results, 'model': database_sign})
 
 
 class RegisterView(FormView):

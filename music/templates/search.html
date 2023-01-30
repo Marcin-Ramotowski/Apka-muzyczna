@@ -11,10 +11,13 @@
     </form>
     {% if results %}
         <h3>Wyniki:</h3>
-        <ul>
+        <div>
             {% for result in results %}
-            <li class="w3-bar-block w3-border-green">{{ result }}</li>
+            <div class="w3-panel w3-light-gray">{{ result }}
+                {% if model == 'piosenka' %}
+                    <a class="w3-purple w3-button" href="{{ result.get_url }}">Pobierz</a></div>
+                {% endif %}
             {%  endfor %}
-        </ul>
+        </div>
     {% endif %}
 {% endblock %}
