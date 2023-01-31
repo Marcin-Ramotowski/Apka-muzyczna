@@ -1,10 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from .models import Uzytkownik
 
-
-# def validate_password2():
-#     return True
 
 class LoginForm(forms.Form):
     login = forms.CharField(label='Login', max_length=50)
@@ -24,7 +21,7 @@ class RegisterForm(UserCreationForm):
     email = forms.EmailField()
 
     class Meta:
-        model = User
+        model = Uzytkownik
         fields = ('first_name', 'last_name', 'username', 'email', 'password1', 'password2')
 
 

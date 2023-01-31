@@ -16,7 +16,7 @@
         <h3>Ulubione piosenki:</h3>
         {% for song in songs %}
             <div class="w3-panel" style="background-color: #DDDDDD">{{ song }}
-            <a class="w3-purple w3-button" style="margin-left: 20px" href="{{ result.get_url }}">Pobierz</a>
+            <a class="w3-purple w3-button" style="margin-left: 20px" href="{{ song.get_url }}">Pobierz</a>
             </div>
         {% endfor %}
         <h3>Ulubieni artyści:</h3>
