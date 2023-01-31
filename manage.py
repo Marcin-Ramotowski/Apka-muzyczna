@@ -9,6 +9,7 @@ load_dotenv()
 LOGIN = os.getenv("DB_USERNAME")
 PASSWORD = os.getenv("DB_PASSWORD")
 DATABASE = os.getenv("DB_NAME")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 
 def main():
