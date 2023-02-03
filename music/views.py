@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse
 from .forms import SearchForm, RegisterForm, UploadForm
-from .models import *
+from .models import Autor, Album, Utwor, Uzytkownik, Playlista
 import mimetypes
 
 
@@ -19,20 +19,15 @@ def start(request):
 def profile(request):
     username = request.user
     user_id = request.user.id
+    user = get_object_or_404(Uzytkownik, id=user_id)
 
-    songs_ids = BibliotekaPiosenek.objects.filter(uzytkownik_id=user_id)
-    songs = [get_object_or_404(Utwor, utwor_id=record.utwor_id) for record in songs_ids]
+    songs = user.user_songs_library.all()
+    authors = user.subscriptions_user.all()
+    albums = user.user_albums_library.all()
+    playlists = user.user_playlists_library.all()
 
-    authors_ids = Subskrypcja.objects.filter(uzytkownik_id=user_id)
-    authors = [get_object_or_404(Autor, autor_id=record.autor_id) for record in authors_ids]
-
-    albums_ids = BibliotekaAlbumow.objects.filter(uzytkownik_id=user_id)
-    albums = [get_object_or_404(Album, album_id=record.album_id) for record in albums_ids]
-
-    # playlists_ids = BibliotekaPlaylist.objects.filter(uzytkownik_id=user_id)
-    # playlists = [get_object_or_404(Playlista, playlista_id=record.playlista_id) for record in playlists_ids]
     return render(request, 'profile.html', {'username': username, 'songs': songs, 'authors': authors,
-                                            'albums': albums, 'playlists': ()})
+                                            'albums': albums, 'playlists': playlists})
 
 
 @login_required(login_url='/login')

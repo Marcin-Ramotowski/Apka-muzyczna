@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import AbstractUser
+from django.shortcuts import get_object_or_404
 
 
 class Autor(models.Model):
@@ -82,7 +83,7 @@ class Playlista(models.Model):
         return f'"{self.nazwa}" {user}'
 
 
-class PiosenkiPlaylisty(models.Model):
+class BibliotekaPlaylist(models.Model):
     class Meta:
         db_table = "playlista_utwor"
 
@@ -97,6 +98,10 @@ class Subskrypcja(models.Model):
     uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='subscriptions_user')
     autor = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='subscriptions_author')
 
+    def __str__(self):
+        subskrypcja = get_object_or_404(Autor, autor_id=self.autor_id)
+        return str(subskrypcja)
+
 
 class BibliotekaPiosenek(models.Model):
     class Meta:
@@ -104,7 +109,11 @@ class BibliotekaPiosenek(models.Model):
 
     library_song_id = models.IntegerField(primary_key=True)
     utwor = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='songs_in_library')
-    uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_song_library')
+    uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_songs_library')
+
+    def __str__(self):
+        piosenka = get_object_or_404(Utwor, utwor_id=self.utwor_id)
+        return str(piosenka)
 
 
 class BibliotekaAlbumow(models.Model):
@@ -113,4 +122,21 @@ class BibliotekaAlbumow(models.Model):
 
     library_album_id = models.IntegerField(primary_key=True)
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='albums_in_library')
-    uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_album_library')
+    uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_albums_library')
+
+    def __str__(self):
+        albums = get_object_or_404(Album, album_id=self.album_id)
+        return str(albums)
+
+
+class PlaylistyUzytkownika(models.Model):
+    class Meta:
+        db_table = 'biblioteka_playlisty'
+
+    library_playlist_id = models.IntegerField(primary_key=True)
+    playlista = models.ForeignKey(Playlista, on_delete=models.CASCADE, related_name='playlists_in_library')
+    uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_playlists_library')
+
+    def __str__(self):
+        playlists = get_object_or_404(Playlista, playlista_id=self.playlista_id)
+        return str(playlists)
