@@ -17,6 +17,7 @@
     <a class="w3-button w3-red w3-right" href="{% url 'logout' %}">
     Wyloguj się
     </a>
+    <a class="w3-button w3-yellow w3-right" href="{% url 'music:profile' %}">Twój profil</a>
 {% else %}
     <a class="w3-button w3-light-green w3-right" href="{% url 'login' %}">
         Zaloguj się
@@ -29,9 +30,7 @@
     <h2>Cześć,</h2>
     <p class="w3-text-black">witaj w aplikacji "Muza na luzie" - nowym serwisie muzycznym
         tworzonym z pasją, prezentującym muzykę w luźnym stylu.</p>
-    {% if user.is_authenticated %}
-        <a class="w3-yellow w3-button" href="{% url 'music:profile' %}">Twój profil</a>
-    {% else %}
+    {% if not user.is_authenticated %}
         <p>Aby rozpocząć przygodę, zaloguj się</p>
     {% endif %}
 </div>

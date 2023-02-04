@@ -15,10 +15,19 @@
             {% for result in results %}
             <div class="w3-panel w3-light-gray">{{ result }}
                 {% if model == 'piosenka' %}
-                    <a class="w3-purple w3-button" href="{{ result.get_url }}">Pobierz</a></div>
-                {% else %}
-                    </div>
+                    <a class="w3-purple w3-button" href="{{ result.get_url }}">Pobierz</a>
+                    <a class="w3-green w3-button" href="{{ result.get_like_url }}">Polub</a>
                 {% endif %}
+                {% if model == 'autor' %}
+                    <a class="w3-green w3-button" href="{{ result.get_subscribe_url }}">Subskrybuj</a>
+                {% endif %}
+                {% if model == 'album' %}
+                    <a class="w3-green w3-button" href="{{ result.get_like_url }}">Polub</a>
+                {% endif %}
+                {% if model == 'playlista' %}
+                    <a class="w3-green w3-button" href="{{ result.get_like_url }}">Polub</a>
+                {% endif %}
+                </div>
             {%  endfor %}
         </div>
     {% endif %}

@@ -17,19 +17,26 @@
         {% for song in songs %}
             <div class="w3-panel" style="background-color: #DDDDDD">{{ song }}
             <a class="w3-purple w3-button" style="margin-left: 20px" href="{{ song.get_url }}">Pobierz</a>
+            <a class="w3-red w3-button" style="margin-left: 20px" href="{{ song.get_unlike_url }}">Usuń</a>
             </div>
         {% endfor %}
         <h3>Ulubieni artyści:</h3>
         {% for author in authors %}
-            <div class="w3-panel" style="background-color: #DDDDDD">{{ author }}</div>
+            <div class="w3-panel" style="background-color: #DDDDDD">{{ author }}
+            <a class="w3-red w3-button" style="margin-left: 20px" href="{{ author.get_unsubscribe_url }}">Usuń</a>
+            </div>
         {% endfor %}
         <h3>Ulubione albumy:</h3>
         {% for album in albums %}
-            <div class="w3-panel" style="background-color: #DDDDDD">{{ album }}</div>
+            <div class="w3-panel" style="background-color: #DDDDDD">{{ album }}
+                <a class="w3-red w3-button" style="margin-left: 20px" href="{{ album.get_unlike_url }}">Usuń</a>
+            </div>
         {% endfor %}
         <h3>Ulubione playlisty:</h3>
         {% for playlist in playlists %}
-            <div class="w3-panel" style="background-color: #DDDDDD">{{ playlist }}</div>
+            <div class="w3-panel" style="background-color: #DDDDDD">{{ playlist }}
+                <a class="w3-red w3-button" style="margin-left: 20px" href="{{ playlist.get_unlike_url }}">Usuń</a>
+            </div>
         {% endfor %}
     {% endif %}
 </div>

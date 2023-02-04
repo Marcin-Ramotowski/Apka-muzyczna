@@ -7,7 +7,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse
 from .forms import SearchForm, RegisterForm, UploadForm
-from .models import Autor, Album, Utwor, Uzytkownik, Playlista
+from .models import Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja, \
+    BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow
 import mimetypes
 
 
@@ -38,6 +39,33 @@ def download_file(request, filename):
     response = StreamingHttpResponse(fl, content_type=mime_type)
     response['Content-Disposition'] = f"attachment; filename={filename}"
     return response
+
+
+@login_required(login_url='/login')
+def like(request, model_name, record_id):
+    models = {'autor': Subskrypcja, 'utwor': BibliotekaPiosenek, 'album': BibliotekaAlbumow,
+              'playlista': PlaylistyUzytkownika}
+    user_id = request.user.id
+    model = models[model_name]
+    second_field = model_name + '_id'
+
+    record = model.objects.filter(**{'uzytkownik_id': user_id, f'{second_field}': record_id}).first()
+    if record:
+        messages.info(request, 'Już polubiłeś.')
+    else:
+        model.objects.create(**{'uzytkownik_id': user_id, f'{second_field}': record_id})
+        messages.success(request, 'Polubiono pomyślnie')
+    return redirect('music:search')
+
+
+@login_required(login_url='/login')
+def unlike(request, model_name, record_id):
+    models = {'autor': Subskrypcja, 'utwor': BibliotekaPiosenek, 'album': BibliotekaAlbumow,
+              'playlista': PlaylistyUzytkownika}
+    model = models[model_name]
+    record = get_object_or_404(model, id=record_id)
+    record.delete()
+    return redirect('music:profile')
 
 
 class UploadView(FormView, LoginRequiredMixin):
