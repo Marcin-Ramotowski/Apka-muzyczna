@@ -5,11 +5,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, FileResponse
 from .forms import SearchForm, RegisterForm, UploadForm
 from .models import Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja, \
     BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow
 import mimetypes
+import os
 
 
 def start(request):
@@ -66,6 +67,15 @@ def unlike(request, model_name, record_id):
     record = get_object_or_404(model, id=record_id)
     record.delete()
     return redirect('music:profile')
+
+
+@login_required(login_url='/login')
+def play(request, filename):
+    file_path = 'music/static/media/' + filename
+    file = open(file_path, 'rb')
+    response = FileResponse(file, content_type='audio/mpeg')
+    response['Content-Length'] = os.path.getsize(file_path)
+    return response
 
 
 class UploadView(FormView, LoginRequiredMixin):

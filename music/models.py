@@ -58,10 +58,12 @@ class Utwor(models.Model):
     def get_like_url(self):
         return reverse('music:like', args=['utwor', self.utwor_id])
 
+    def get_play_url(self):
+        return reverse('music:play', args=[self.plik_sciezka])
+
     def __str__(self):
         autor = Autor.objects.filter(autor_id=self.autor_id).first()
-        duration = str(self.dlugosc)[3:]
-        return f'"{self.tytul}" {autor} {duration}'
+        return f'"{self.tytul}" {autor}'
 
 
 class Uzytkownik(AbstractUser):
@@ -130,6 +132,14 @@ class BibliotekaPiosenek(models.Model):
     def __str__(self):
         piosenka = get_object_or_404(Utwor, utwor_id=self.utwor_id)
         return str(piosenka)
+
+    def get_url(self):
+        piosenka = get_object_or_404(Utwor, utwor_id=self.utwor_id)
+        return piosenka.get_url()
+
+    def get_play_url(self):
+        piosenka = get_object_or_404(Utwor, utwor_id=self.utwor_id)
+        return piosenka.get_play_url()
 
     def get_unlike_url(self):
         return reverse('music:unlike', args=['utwor', self.id])
