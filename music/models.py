@@ -15,8 +15,16 @@ class Autor(models.Model):
     wiecej_info = models.TextField()
 
     def __str__(self):
-        pseudonim = f"'{self.pseudonim}'" if self.pseudonim else ''
-        return f"{self.imie} {self.nazwisko} {pseudonim}"
+        return self.pseudonim if self.pseudonim else f"{self.imie} {self.nazwisko}"
+
+    @staticmethod
+    def search(query):
+        results = Autor.objects.filter(
+            models.Q(imie__contains=query) |
+            models.Q(nazwisko__contains=query) |
+            models.Q(pseudonim__contains=query)
+        )
+        return results
 
     def get_subscribe_url(self):
         return reverse('music:like', args=['autor', self.autor_id])
@@ -36,6 +44,19 @@ class Album(models.Model):
         autor = Autor.objects.filter(autor_id=self.autor_id).first()
         return f'"{self.tytul}" {autor}'
 
+    @staticmethod
+    def search(query):
+        if query.isdigit():
+            results = Album.objects.filter(rok_wydania__exact=query)
+        else:
+            results = Album.objects.filter(
+                models.Q(tytul__contains=query) |
+                models.Q(autor__imie__contains=query) |
+                models.Q(autor__nazwisko__contains=query) |
+                models.Q(autor__pseudonim__contains=query)
+            )
+        return results
+
     def get_like_url(self):
         return reverse('music:like', args=['album', self.album_id])
 
@@ -52,7 +73,18 @@ class Utwor(models.Model):
     dlugosc = models.TimeField()
     plik_sciezka = models.CharField(max_length=60)
 
-    def get_url(self):
+    @staticmethod
+    def search(query):
+        results = Utwor.objects.filter(
+            models.Q(tytul__contains=query) |
+            models.Q(gatunek__contains=query) |
+            models.Q(autor__imie__contains=query) |
+            models.Q(autor__nazwisko__contains=query) |
+            models.Q(autor__pseudonim__contains=query)
+        )
+        return results
+
+    def get_download_url(self):
         return reverse('music:download', args=[self.plik_sciezka])
 
     def get_like_url(self):
@@ -92,6 +124,13 @@ class Playlista(models.Model):
     def __str__(self):
         user = Uzytkownik.objects.filter(id=self.uzytkownik_id).first()
         return f'"{self.nazwa}" {user}'
+
+    @staticmethod
+    def search(query):
+        results = Playlista.objects.filter(
+            models.Q(nazwa__contains=query)
+        )
+        return results
 
     def get_like_url(self):
         return reverse('music:like', args=['playlista', self.playlista_id])
@@ -133,9 +172,9 @@ class BibliotekaPiosenek(models.Model):
         piosenka = get_object_or_404(Utwor, utwor_id=self.utwor_id)
         return str(piosenka)
 
-    def get_url(self):
+    def get_download_url(self):
         piosenka = get_object_or_404(Utwor, utwor_id=self.utwor_id)
-        return piosenka.get_url()
+        return piosenka.get_download_url()
 
     def get_play_url(self):
         piosenka = get_object_or_404(Utwor, utwor_id=self.utwor_id)

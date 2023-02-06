@@ -112,14 +112,11 @@ class SearchFormView(FormView, LoginRequiredMixin):
 
     def post(self, request, *args, **kwargs):
         models = {'autor': Autor, 'piosenka': Utwor, 'album': Album, 'playlista': Playlista}
-        filter_fields = {'autor': 'imie__contains', 'piosenka': 'tytul__contains',
-                         'album': 'tytul__contains', 'playlista': 'nazwa__contains'}
         form = self.form_class(request.POST)
         query = form.data['query']
         database_sign = form.data['database']  # pobieramy wybraną przez użytkownika tabelę
-        database = models[database_sign]  # pobieramy klasę reprezentującą wybraną tabelę
-        field = filter_fields[database_sign]  # wybieramy pole, po którym filtrujemy
-        results = database.objects.filter(**{field: query})  # filtrujemy po wybranym polu dopasowując do query
+        model = models[database_sign]  # pobieramy klasę reprezentującą wybraną tabelę
+        results = model.search(query)
         return render(request, self.template_name, {'form': form, 'results': results, 'model': database_sign})
 
 
