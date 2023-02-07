@@ -57,6 +57,6 @@ class RegisterForm(UserCreationForm):
 class UploadForm(forms.Form):
     title = forms.CharField(max_length=30, label='Tytuł')
     genre = forms.CharField(max_length=20, label='Gatunek')
-    autor = AutorField(label='Autor', help_text='Imię nazwisko pseudonim')
-    album = AlbumField(label='Album', help_text='Tytuł, rok wydania')
+    autor = AutorField(label='Autor', widget=forms.TextInput(attrs={'placeholder': 'Imię nazwisko pseudonim'}))
+    album = AlbumField(label='Album', widget=forms.TextInput(attrs={'placeholder': 'Tytuł, rok wydania'}))
     file = forms.FileField(widget=forms.ClearableFileInput)

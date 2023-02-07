@@ -20,5 +20,34 @@
 }
 
 .download-button{
-  background-color: #99FF99;
+  margin-left: 10px;
+  margin-bottom: 27px;
+}
+
+.like-button{
+  margin-left: 20px;
+  margin-right: 40px;
+  margin-bottom: 27px;
+}
+
+.submit-button{
+  margin-top: 10px
+}
+
+.unlike-button{
+  margin-left: 20px;
+  margin-right: 40px;
+  margin-bottom: 27px;
+}
+
+.unlike-button2{
+  margin-left: 20px;
+}
+
+.smooth-gray{
+  background-color: #DDDDDD;
+}
+
+.audio-controller{
+  margin-top: 20px;
 }

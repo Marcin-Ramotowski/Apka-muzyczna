@@ -1,17 +1,32 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
     <meta charset="UTF-8">
-    <title>Aplikacja Muza na luzie</title>
+    {% block title %}
+        <title>Aplikacja Muza na luzie</title>
+    {% endblock %}
     {% block css %}
-    <link rel="stylesheet" href="../static/base.css">
-    <link rel="stylesheet" href="../static/w3.css">
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    <link rel="stylesheet" href="{% static 'w3.css' %}">
     {% endblock %}
 </head>
+
 <body>
+{% if messages %}
 {% for message in messages %}
-    <div class="w3-panel w3-green">{{ message }}</div>
+    {% if message.tags == 'success' %}
+        <div class="w3-panel w3-green">{{ message }}</div>
+    {% elif message.tags == 'info' %}
+        <div class="w3-panel w3-yellow">{{ message }}</div>
+    {% elif message.tags == 'error' %}
+        <div class="w3-panel w3-red">{{ message }}</div>
+    {% endif %}
 {% endfor %}
+{% endif %}
+
+{% block buttons %}
 <div class="w3-container w3-white">
 {% if user.is_authenticated %}
     <a class="w3-button w3-red w3-right" href="{% url 'logout' %}">
@@ -26,6 +41,8 @@
         Zarejestruj się
     </a>
 {% endif %}
+{% endblock %}
+
 {% block content %}
     <h2>Cześć,</h2>
     <p class="w3-text-black">witaj w aplikacji "Muza na luzie" - nowym serwisie muzycznym

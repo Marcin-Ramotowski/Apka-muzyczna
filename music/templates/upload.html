@@ -1,15 +1,10 @@
-{% extends 'login.html' %}
+{% extends 'start.html' %}
 {% block content %}
-    {% if errors %}
-    {% for error in errors %}
-        {{ error }}
-    {% endfor %}
-    {% endif %}
-{#    {% load crispy_forms_tags %}#}
+    {% load crispy_forms_tags %}
     <form enctype="multipart/form-data" method="post">
     <h3>Załaduj swoją piosenkę:</h3>
     <div>{{ form.as_p }}</div>
     {% csrf_token %}
-    <input style="margin-top: 10px" type="submit" value="Prześlij">
+    <input class="submit-button" type="submit" value="Prześlij">
     </form>
 {% endblock %}

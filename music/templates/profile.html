@@ -1,13 +1,14 @@
 {% extends 'start.html' %}
+{% load static %}
 {% block css %}
-    <link rel="stylesheet" type="text/css" href="../../static/base.css">
-    <link rel="stylesheet" type="text/css" href="../../static/w3.css">
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    <link rel="stylesheet" href="{% static 'w3.css' %}">
 {% endblock %}
 {% block content %}
 <body>
     {% if user.is_authenticated %}
         <p class="w3-text-black">Witaj, {{ username }}</p>
-            <p class="w3-text-black" style="font-size: 14px">Zapraszam Cię do świata ekscytujących doznań słuchowych,
+            <p class="w3-text-black">Zapraszam Cię do świata ekscytujących doznań słuchowych,
                 w którym odprężysz się przy dźwiękach swoich ulubionych utworów. :)</p>
         <a class="w3-orange w3-button" href="{% url 'music:upload' %}">Dodaj muzę</a>
         <a class="w3-blue w3-button" href="{% url 'music:search' %}">Szukaj</a>
@@ -15,31 +16,31 @@
         <h2>Biblioteka</h2>
         <h3>Ulubione piosenki:</h3>
         {% for song in songs %}
-            <div class="w3-panel" style="background-color: #DDDDDD"><p>{{ song }}</p>
-                <audio controls style="margin-top: 20px">
+            <div class="w3-panel smooth-gray"><p>{{ song }}</p>
+                <audio controls class="audio-controller">
                   <source src="{{ song.get_play_url }}" type="audio/mpeg">
                   Twoja przeglądarka nie wspiera odtwarzacza audio.
                 </audio>
-                <a class="w3-purple w3-button" style="margin-left: 10px; margin-bottom: 27px" href="{{ song.get_download_url }}">Pobierz</a>
-                <a class="w3-red w3-button" style="margin-left: 20px; margin-right: 40px; margin-bottom: 27px" href="{{ song.get_unlike_url }}">Usuń</a>
+                <a class="w3-purple w3-button download-button" href="{{ song.get_download_url }}">Pobierz</a>
+                <a class="w3-red w3-button unlike-button" href="{{ song.get_unlike_url }}">Usuń</a>
             </div>
         {% endfor %}
         <h3>Ulubieni artyści:</h3>
         {% for author in authors %}
-            <div class="w3-panel" style="background-color: #DDDDDD">{{ author }}
-            <a class="w3-red w3-button" style="margin-left: 20px" href="{{ author.get_unsubscribe_url }}">Usuń</a>
+            <div class="w3-panel smooth-gray">{{ author }}
+            <a class="w3-red w3-button unlike-button2" href="{{ author.get_unsubscribe_url }}">Usuń</a>
             </div>
         {% endfor %}
         <h3>Ulubione albumy:</h3>
         {% for album in albums %}
-            <div class="w3-panel" style="background-color: #DDDDDD">{{ album }}
-                <a class="w3-red w3-button" style="margin-left: 20px" href="{{ album.get_unlike_url }}">Usuń</a>
+            <div class="w3-panel smooth-gray" >{{ album }}
+                <a class="w3-red w3-button unlike-button2" href="{{ album.get_unlike_url }}">Usuń</a>
             </div>
         {% endfor %}
         <h3>Ulubione playlisty:</h3>
         {% for playlist in playlists %}
-            <div class="w3-panel" style="background-color: #DDDDDD">{{ playlist }}
-                <a class="w3-red w3-button" style="margin-left: 20px" href="{{ playlist.get_unlike_url }}">Usuń</a>
+            <div class="w3-panel smooth-gray">{{ playlist }}
+                <a class="w3-red w3-button unlike-button2" href="{{ playlist.get_unlike_url }}">Usuń</a>
             </div>
         {% endfor %}
     {% endif %}

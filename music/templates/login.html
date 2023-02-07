@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Aplikacja Muza na luzie</title>
-    <link rel="stylesheet" href="../static/base.css">
-    <link rel="stylesheet" href="../static/w3.css">
-</head>
-<body>
-{% for message in messages %}
-    <div class="w3-panel w3-green">{{ message }}</div>
-{% endfor %}
+{% extends 'start.html' %}
+{% load static %}
+
+{% block buttons %}
+{% endblock %}
+
 {% block content %}
 <form class="middle_form" action="{% url 'login' %}" method="post">
     <h2>Zaloguj się</h2>
@@ -18,5 +12,4 @@
     <p class="text-center">Nie masz u nas konta? <a href="{% url 'register' %}">Zarejestruj się</a>.</p>
     <input type="submit" value="Zaloguj się">
 </form>
-</body>
 {% endblock %}
