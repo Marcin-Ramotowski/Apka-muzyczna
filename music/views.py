@@ -9,7 +9,6 @@ from django.http import StreamingHttpResponse, FileResponse
 from .forms import SearchForm, RegisterForm, UploadForm
 from .models import Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja, \
     BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow
-import mimetypes
 import os
 
 
@@ -36,9 +35,9 @@ def profile(request):
 def download_file(request, filename):
     fl_path = 'music/static/media/' + filename
     fl = open(fl_path, 'rb')
-    mime_type = mimetypes.guess_type(fl_path)[0]
-    response = StreamingHttpResponse(fl, content_type=mime_type)
+    response = StreamingHttpResponse(fl, content_type='audio/mpeg')
     response['Content-Disposition'] = f"attachment; filename={filename}"
+    response['Content-Length'] = os.path.getsize(fl_path)
     return response
 
 
@@ -85,10 +84,33 @@ class UploadView(FormView, LoginRequiredMixin):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
+            title = form.data['title']
+            genre = form.data['genre']
+            imie, nazwisko, pseudonim = form.data['autor'].split()
+            tytul, rok_wydania = form.data['album'].split(', ')
+
+            autor = Autor.objects.filter(imie=imie, nazwisko=nazwisko, pseudonim=pseudonim).first()
+            if not autor:
+                autor = Autor.objects.create(imie=imie, nazwisko=nazwisko, pseudonim=pseudonim)
+            album = Album.objects.filter(tytul=tytul, rok_wydania=rok_wydania).first()
+            if not album:
+                album = Album.objects.create(autor_id=autor.autor_id, tytul=tytul, rok_wydania=rok_wydania)
+
+            artist = autor.pseudonim if autor.pseudonim else f'{autor.imie} {autor.nazwisko}'
+            file_path = f'{artist} - {form.data["title"]}.mp3'
+
+            utwor = Utwor.objects.filter(autor_id=autor.autor_id, tytul=title).first()
+            if utwor:
+                messages.info(request, 'Ten utwór już znajduje się w bazie.')
+                return redirect('music:upload')
+            else:
+                Utwor.objects.create(autor_id=autor.autor_id, album_id=album.album_id, tytul=title,
+                                     gatunek=genre, dlugosc='00:03:18', plik_sciezka=file_path)
+                messages.success(request, 'Pomyślnie zapisano utwór w bazie.')
+
             file = request.FILES['file']
-            path = f'C:\\Users\\asus\\Python Projekty\\Apka_muzyczna\\music\\static\\media\\' \
-                   f'{form.data["title"]}.mp3'
-            with open(path, 'wb+') as destination:
+            absolute_path = f'C:\\Users\\asus\\Python Projekty\\Apka_muzyczna\\music\\static\\media\\' + file_path
+            with open(absolute_path, 'wb+') as destination:
                 for chunk in file.chunks():
                     destination.write(chunk)
             messages.success(request, 'Pomyślnie załadowano plik.')

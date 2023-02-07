@@ -1,6 +1,35 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 from .models import Uzytkownik
+
+
+class AutorField(forms.Field):
+    def to_python(self, value):
+        return value.split() if value else []
+
+    def validate(self, value):
+        name, surname, nick = value
+        if not name.isalpha() or not surname.isalpha():
+            raise ValidationError('Podaj prawidłowe imię i nazwisko')
+
+    def clean(self, value):
+        result = super().clean(value)
+        return result
+
+
+class AlbumField(forms.Field):
+    def to_python(self, value):
+        return value.split(', ') if value else []
+
+    def validate(self, value):
+        year: str = value[1]
+        if not year.isdigit():
+            raise ValidationError('Rok wydania podany po przecinku musi być liczbą!')
+
+    def clean(self, value):
+        result = super().clean(value)
+        return result
 
 
 class LoginForm(forms.Form):
@@ -28,4 +57,6 @@ class RegisterForm(UserCreationForm):
 class UploadForm(forms.Form):
     title = forms.CharField(max_length=30, label='Tytuł')
     genre = forms.CharField(max_length=20, label='Gatunek')
+    autor = AutorField(label='Autor', help_text='Imię nazwisko pseudonim')
+    album = AlbumField(label='Album', help_text='Tytuł, rok wydania')
     file = forms.FileField(widget=forms.ClearableFileInput)
