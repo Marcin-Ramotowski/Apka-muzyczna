@@ -84,10 +84,11 @@ class UploadView(FormView, LoginRequiredMixin):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
-            title = form.data['title']
-            genre = form.data['genre']
-            imie, nazwisko, pseudonim = form.data['autor'].split()
-            tytul, rok_wydania = form.data['album'].split(', ')
+            cd = form.cleaned_data
+            title = cd['title']
+            genre = cd['genre']
+            imie, nazwisko, pseudonim = cd['autor']
+            tytul, rok_wydania = cd['album']
 
             autor = Autor.objects.filter(imie=imie, nazwisko=nazwisko, pseudonim=pseudonim).first()
             if not autor:
@@ -97,7 +98,8 @@ class UploadView(FormView, LoginRequiredMixin):
                 album = Album.objects.create(autor_id=autor.autor_id, tytul=tytul, rok_wydania=rok_wydania)
 
             artist = autor.pseudonim if autor.pseudonim else f'{autor.imie} {autor.nazwisko}'
-            file_path = f'{artist} - {form.data["title"]}.mp3'
+            file_path = f'{artist} - {cd["title"]}.mp3'
+            file = request.FILES['file']
 
             utwor = Utwor.objects.filter(autor_id=autor.autor_id, tytul=title).first()
             if utwor:
@@ -105,10 +107,9 @@ class UploadView(FormView, LoginRequiredMixin):
                 return redirect('music:upload')
             else:
                 Utwor.objects.create(autor_id=autor.autor_id, album_id=album.album_id, tytul=title,
-                                     gatunek=genre, dlugosc='00:03:18', plik_sciezka=file_path)
+                                     gatunek=genre, plik_sciezka=file_path)
                 messages.success(request, 'Pomyślnie zapisano utwór w bazie.')
 
-            file = request.FILES['file']
             absolute_path = f'C:\\Users\\asus\\Python Projekty\\Apka_muzyczna\\music\\static\\media\\' + file_path
             with open(absolute_path, 'wb+') as destination:
                 for chunk in file.chunks():
@@ -116,8 +117,11 @@ class UploadView(FormView, LoginRequiredMixin):
             messages.success(request, 'Pomyślnie załadowano plik.')
             return redirect('music:profile')
         else:
-            form = UploadForm()
-            return render(request, self.template_name, context={'errors': form.errors, 'form': form})
+            for error in form.errors.values():
+                text = error.as_text()[2:]
+                messages.error(request, text)
+            form = self.form_class()
+            return render(request, self.template_name, context={'form': form})
 
 
 class BaseLoginView(LoginView):

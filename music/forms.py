@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
+from django.core import validators
 from .models import Uzytkownik
 
 
@@ -9,6 +10,7 @@ class AutorField(forms.Field):
         return value.split() if value else []
 
     def validate(self, value):
+        super().validate(value)
         name, surname, nick = value
         if not name.isalpha() or not surname.isalpha():
             raise ValidationError('Podaj prawidłowe imię i nazwisko')
@@ -23,9 +25,11 @@ class AlbumField(forms.Field):
         return value.split(', ') if value else []
 
     def validate(self, value):
+        super().validate(value)
         year: str = value[1]
         if not year.isdigit():
-            raise ValidationError('Rok wydania podany po przecinku musi być liczbą!')
+            raise ValidationError('Rok wydania podany po przecinku musi być liczbą',
+                                  params={'album': 'niepoprawny rok'})
 
     def clean(self, value):
         result = super().clean(value)

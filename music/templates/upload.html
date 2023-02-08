@@ -3,7 +3,7 @@
     {% load crispy_forms_tags %}
     <form enctype="multipart/form-data" method="post">
     <h3>Załaduj swoją piosenkę:</h3>
-    <div>{{ form.as_p }}</div>
+    <div>{{ form|crispy }}</div>
     {% csrf_token %}
     <input class="submit-button" type="submit" value="Prześlij">
     </form>

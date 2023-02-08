@@ -70,7 +70,7 @@ class Utwor(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='songs_in_album')
     tytul = models.CharField(max_length=60)
     gatunek = models.CharField(max_length=30)
-    dlugosc = models.TimeField()
+    dlugosc = models.TimeField(null=True)
     plik_sciezka = models.CharField(max_length=60)
 
     @staticmethod
