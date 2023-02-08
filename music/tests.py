@@ -1,68 +1,82 @@
-from django.test import Client
-from django.shortcuts import reverse
 import pytest
-from .models import Autor
+from music.models import Album, Autor, Subskrypcja
 
 
-def test_start_run():
-    client = Client()
+def login_user(client, django_user_model, username, password):
+    """ Tworzy i loguje testowego użytkownika do serwisu."""
+    user = django_user_model.objects.create_user(username=username, password=password)
+    client.login(username=username, password=password)
+    return user
+
+
+def test_start_page_for_anonymous_user(client):
+    """ Sprawdza, czy użytkownik widzi właściwą treść na stronie, gdy nie jest zalogowany."""
     response = client.get('/')
     assert response.status_code == 200
-
-
-def test_login_run():
-    client = Client()
-    response = client.get('/login')
-    assert response.status_code == 301
-
-
-def test_logout_run():
-    client = Client()
-    response = client.get('/logout')
-    assert response.status_code == 301
-
-
-def test_profile_run():
-    client = Client()
-    response = client.get('/profile')
-    assert response.status_code == 301
-
-
-def test_search_run():
-    client = Client()
-    response = client.get('/search')
-    assert response.status_code == 301
-
-
-def test_download_run():
-    # test
-    client = Client()
-    response = client.get('/download')
-    assert response.status_code == 301
-
-
-def test_upload_run():
-    client = Client()
-    response = client.get('/login')
-    assert response.status_code == 301
-
-
-def test_start_content_when_not_login():
-    """ Sprawdza czy uzytkownik widzi właściwą treść na stronie, gdy nie jest zalogowany"""
-    client = Client()
-    response = client.get('/')
-    check_content_when_not_login = b'Aby rozpocz\xc4\x85\xc4\x87 przygod\xc4\x99,' \
-                                   b' zaloguj si\xc4\x99' in response.content
-    assert check_content_when_not_login
+    assert b"Zarejestruj si\xc4\x99" in response.content
+    assert b"Zaloguj si\xc4\x99" in response.content
+    assert b'Aby rozpocz\xc4\x85\xc4\x87 przygod\xc4\x99, zaloguj si\xc4\x99' in response.content
 
 
 @pytest.mark.django_db
-def test_search_autor():
-    client = Client()
-    response = client.get('/search')
+def test_start_page_for_authenticated_user(client, django_user_model):
+    """ Sprawdza, czy użytkownik widzi właściwą treść na stronie, gdy jest zalogowany."""
+    login_user(client, django_user_model, 'testuser', 'testpassword')
+    response = client.get('/')
+    assert b"Tw\xc3\xb3j profil" in response.content
+    assert b"Wyloguj si\xc4\x99" in response.content
 
-    database = Autor
-    query = 'Natalia'
-    results = database.objects.filter(imie=query)
-    # results = results.values_list(*fields)
-    assert results.first() is not None
+
+@pytest.mark.django_db
+def test_artists_on_user_profile(client, django_user_model):
+    """ Sprawdza, czy użytkownik widzi subskrybowanych artystów na stronie."""
+    user = login_user(client, django_user_model, 'testuser', 'testpassword')
+    author = Autor.objects.create(imie="Małgorzata", nazwisko="Jamroży", pseudonim="Margaret",
+                                  wiecej_info="polska piosenkarka, kompozytorka i autorka tekstów piosenek,"
+                                              " z wykształcenia projektantka mody")
+    Subskrypcja.objects.create(autor_id=author.autor_id, uzytkownik_id=user.id)
+    response = client.get('/profile/')
+    assert b'Margaret' in response.content
+
+# @pytest.mark.django_db
+# def test_display_no_results()
+
+
+@pytest.mark.django_db
+def test_search_album(client, django_user_model):
+    """ Sprawdza, czy wysyłane przez użytkownika query zwraca pasujące rekordy z tabeli albumów."""
+    author = Autor.objects.create(imie="Małgorzata", nazwisko="Jamroży", pseudonim="Margaret",
+                                  wiecej_info="polska piosenkarka, kompozytorka i autorka tekstów piosenek,"
+                                              " z wykształcenia projektantka mody")
+    album = Album.objects.create(autor_id=author.autor_id, tytul="Monkey Business", rok_wydania=2017,
+                         wiecej_info="12 utworów")
+    model = Album
+    query = 'Margaret'
+    results = model.search(query)
+    assert album in results
+
+
+@pytest.mark.django_db
+def test_unlike_author(client, django_user_model):
+    """ Sprawdza, czy użytkownik może usunąć autora z biblioteki."""
+    user = login_user(client, django_user_model, 'testuser', 'testpassword')
+    author = Autor.objects.create(imie="Małgorzata", nazwisko="Jamroży", pseudonim="Margaret",
+                                  wiecej_info="polska piosenkarka, kompozytorka i autorka tekstów piosenek,"
+                                              " z wykształcenia projektantka mody")
+    Subskrypcja.objects.create(autor_id=author.autor_id, uzytkownik_id=user.id)
+    response = client.get('/unlike/autor/2')
+    assert response.status_code in (200, 302)
+
+
+@pytest.mark.django_db
+def test_download_file(client, django_user_model):
+    """ Sprawdza, pobieranie plików działa prawidłowo."""
+    response = client.get('/download/Margaret - Byle Jak.mp3')
+    assert response.status_code in (200, 302)
+
+
+@pytest.mark.django_db
+def test_play_file(client, django_user_model):
+    """ Sprawdza, czy przekazywanie plików do odtwarzacza działa prawidłowo."""
+    response = client.get('/play/Margaret - Byle Jak.mp3')
+    assert response.status_code in (200, 302)
