@@ -168,17 +168,19 @@ class BibliotekaPiosenek(models.Model):
     utwor = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='songs_in_library')
     uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_songs_library')
 
+    def get_song(self):
+        return get_object_or_404(Utwor, utwor_id=self.utwor_id)
+
     def __str__(self):
-        piosenka = get_object_or_404(Utwor, utwor_id=self.utwor_id)
-        return str(piosenka)
+        return str(self.get_song())
 
     def get_download_url(self):
-        piosenka = get_object_or_404(Utwor, utwor_id=self.utwor_id)
-        return piosenka.get_download_url()
+        song = self.get_song()
+        return song.get_download_url()
 
     def get_play_url(self):
-        piosenka = get_object_or_404(Utwor, utwor_id=self.utwor_id)
-        return piosenka.get_play_url()
+        song = self.get_song()
+        return song.get_play_url()
 
     def get_unlike_url(self):
         return reverse('music:unlike', args=['utwor', self.id])

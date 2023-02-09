@@ -38,9 +38,6 @@ def test_artists_on_user_profile(client, django_user_model):
     response = client.get('/profile/')
     assert b'Margaret' in response.content
 
-# @pytest.mark.django_db
-# def test_display_no_results()
-
 
 @pytest.mark.django_db
 def test_search_album(client, django_user_model):
