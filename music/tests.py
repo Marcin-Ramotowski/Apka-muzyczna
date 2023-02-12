@@ -13,9 +13,9 @@ def test_start_page_for_anonymous_user(client):
     """ Sprawdza, czy użytkownik widzi właściwą treść na stronie, gdy nie jest zalogowany."""
     response = client.get('/')
     assert response.status_code == 200
-    assert b"Zarejestruj si\xc4\x99" in response.content
-    assert b"Zaloguj si\xc4\x99" in response.content
-    assert b'Aby rozpocz\xc4\x85\xc4\x87 przygod\xc4\x99, zaloguj si\xc4\x99' in response.content
+    assert "Zarejestruj się".encode() in response.content
+    assert "Zaloguj się".encode() in response.content
+    assert "Aby rozpocząć przygodę, zaloguj się".encode() in response.content
 
 
 @pytest.mark.django_db
@@ -23,8 +23,8 @@ def test_start_page_for_authenticated_user(client, django_user_model):
     """ Sprawdza, czy użytkownik widzi właściwą treść na stronie, gdy jest zalogowany."""
     login_user(client, django_user_model, 'testuser', 'testpassword')
     response = client.get('/')
-    assert b"Tw\xc3\xb3j profil" in response.content
-    assert b"Wyloguj si\xc4\x99" in response.content
+    assert "Twój profil".encode() in response.content
+    assert "Wyloguj się".encode() in response.content
 
 
 @pytest.mark.django_db
@@ -46,7 +46,7 @@ def test_search_album(client, django_user_model):
                                   wiecej_info="polska piosenkarka, kompozytorka i autorka tekstów piosenek,"
                                               " z wykształcenia projektantka mody")
     album = Album.objects.create(autor_id=author.autor_id, tytul="Monkey Business", rok_wydania=2017,
-                         wiecej_info="12 utworów")
+                                 wiecej_info="12 utworów")
     model = Album
     query = 'Margaret'
     results = model.search(query)

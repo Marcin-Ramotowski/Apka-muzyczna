@@ -1,16 +1,19 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
+from itertools import zip_longest
 from .models import Uzytkownik
 
 
 class AutorField(forms.Field):
     def to_python(self, value):
-        return value.split() if value else []
+        fields = ['name', 'surname', 'nick']
+        return dict(zip_longest(fields, value.split())) if value else {}
 
     def validate(self, value):
         super().validate(value)
-        name, surname, nick = value
+        name = value.get('name')
+        surname = value.get('surname')
         if not name.isalpha() or not surname.isalpha():
             raise ValidationError('Podaj prawidłowe imię i nazwisko')
 
@@ -21,11 +24,12 @@ class AutorField(forms.Field):
 
 class AlbumField(forms.Field):
     def to_python(self, value):
-        return value.split(', ') if value else []
+        fields = ['title', 'published_year']
+        return dict(zip_longest(fields, value.split(', '))) if value else {}
 
     def validate(self, value):
         super().validate(value)
-        year: str = value[1]
+        year = value.get('published_year')
         if not year.isdigit():
             raise ValidationError('Rok wydania podany po przecinku musi być liczbą',
                                   params={'album': 'niepoprawny rok'})

@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-from manage import (DATABASE, LOGIN, PASSWORD)
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-yu850y4sy&2=!xm_cs6!m@j2fw(!n=9fv$l6xgo96#@*)kui_m'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -78,9 +80,9 @@ WSGI_APPLICATION = 'Apka_muzyczna.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': DATABASE,
-        'USER': LOGIN,
-        'PASSWORD': PASSWORD
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv("DB_USERNAME"),
+        'PASSWORD': os.getenv("DB_PASSWORD")
     }
 }
 
@@ -119,11 +121,12 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
+MEDIA_URL = 'music/static/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = "../../profile/"
-LOGOUT_REDIRECT_URL = "../"
+LOGIN_REDIRECT_URL = "music:profile"
+LOGOUT_REDIRECT_URL = "music:start"

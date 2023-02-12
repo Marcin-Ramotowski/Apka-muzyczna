@@ -6,6 +6,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse, FileResponse
+from Apka_muzyczna.settings import BASE_DIR, MEDIA_URL
 from .forms import SearchForm, RegisterForm, UploadForm
 from .models import Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja, \
     BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow
@@ -33,7 +34,7 @@ def profile(request):
 
 @login_required(login_url='/login')
 def download_file(request, filename):
-    fl_path = 'music/static/media/' + filename
+    fl_path = MEDIA_URL + filename
     fl = open(fl_path, 'rb')
     response = StreamingHttpResponse(fl, content_type='audio/mpeg')
     response['Content-Disposition'] = f"attachment; filename={filename}"
@@ -70,14 +71,15 @@ def unlike(request, model_name, record_id):
 
 @login_required(login_url='/login')
 def play(request, filename):
-    file_path = 'music/static/media/' + filename
+    file_path = MEDIA_URL + filename
     file = open(file_path, 'rb')
     response = FileResponse(file, content_type='audio/mpeg')
     response['Content-Length'] = os.path.getsize(file_path)
     return response
 
 
-class UploadView(FormView, LoginRequiredMixin):
+class UploadView(LoginRequiredMixin, FormView):
+    login_url = '/login'
     template_name = 'upload.html'
     form_class = UploadForm
 
@@ -85,32 +87,37 @@ class UploadView(FormView, LoginRequiredMixin):
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             cd = form.cleaned_data
-            title = cd['title']
+            song_title = cd['title']
             genre = cd['genre']
-            imie, nazwisko, pseudonim = cd['autor']
-            tytul, rok_wydania = cd['album']
+            autor_data = cd['autor']
+            name = autor_data.get('name')
+            surname = autor_data.get('surname')
+            nick = autor_data.get('nick')
+            album_data = cd['album']
+            album_title = album_data.get('title')
+            year_publishing = album_data.get('published_year')
 
-            autor = Autor.objects.filter(imie=imie, nazwisko=nazwisko, pseudonim=pseudonim).first()
+            autor = Autor.objects.filter(imie=name, nazwisko=surname).first()
             if not autor:
-                autor = Autor.objects.create(imie=imie, nazwisko=nazwisko, pseudonim=pseudonim)
-            album = Album.objects.filter(tytul=tytul, rok_wydania=rok_wydania).first()
+                autor = Autor.objects.create(imie=name, nazwisko=surname, pseudonim=nick)
+            album = Album.objects.filter(tytul=album_title, rok_wydania=year_publishing).first()
             if not album:
-                album = Album.objects.create(autor_id=autor.autor_id, tytul=tytul, rok_wydania=rok_wydania)
+                album = Album.objects.create(autor_id=autor.autor_id, tytul=album_title, rok_wydania=year_publishing)
 
             artist = autor.pseudonim if autor.pseudonim else f'{autor.imie} {autor.nazwisko}'
             file_path = f'{artist} - {cd["title"]}.mp3'
             file = request.FILES['file']
 
-            utwor = Utwor.objects.filter(autor_id=autor.autor_id, tytul=title).first()
+            utwor = Utwor.objects.filter(autor_id=autor.autor_id, tytul=song_title).first()
             if utwor:
                 messages.info(request, 'Ten utwór już znajduje się w bazie.')
                 return redirect('music:upload')
             else:
-                Utwor.objects.create(autor_id=autor.autor_id, album_id=album.album_id, tytul=title,
+                Utwor.objects.create(autor_id=autor.autor_id, album_id=album.album_id, tytul=song_title,
                                      gatunek=genre, plik_sciezka=file_path)
                 messages.success(request, 'Pomyślnie zapisano utwór w bazie.')
 
-            absolute_path = f'C:\\Users\\asus\\Python Projekty\\Apka_muzyczna\\music\\static\\media\\' + file_path
+            absolute_path = BASE_DIR / MEDIA_URL / file_path
             with open(absolute_path, 'wb+') as destination:
                 for chunk in file.chunks():
                     destination.write(chunk)
@@ -128,11 +135,12 @@ class BaseLoginView(LoginView):
     template_name = 'login.html'
 
 
-class BaseLogoutView(LogoutView, LoginRequiredMixin):
+class BaseLogoutView(LogoutView):
     template_name = 'start.html'
 
 
-class SearchFormView(FormView, LoginRequiredMixin):
+class SearchFormView(LoginRequiredMixin, FormView):
+    login_url = '/login'
     template_name = 'search.html'
     form_class = SearchForm
 

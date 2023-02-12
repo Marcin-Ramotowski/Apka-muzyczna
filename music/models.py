@@ -8,11 +8,17 @@ class Autor(models.Model):
     class Meta:
         db_table = "autor"
 
+    AUTOR_TYPES = (
+        ('ONE', 'osoba'),
+        ('MUL', 'zespół')
+    )
+
     autor_id = models.AutoField(primary_key=True)
-    imie = models.CharField(max_length=30)
-    nazwisko = models.CharField(max_length=50)
-    pseudonim = models.CharField(max_length=40)
-    wiecej_info = models.TextField()
+    imie = models.CharField(max_length=30, null=True)
+    nazwisko = models.CharField(max_length=50, null=True)
+    pseudonim = models.CharField(max_length=40, null=True)
+    rodzaj_autora = models.CharField(choices=AUTOR_TYPES, max_length=6, default='osoba')
+    wiecej_info = models.TextField(null=True)
 
     def __str__(self):
         return self.pseudonim if self.pseudonim else f"{self.imie} {self.nazwisko}"
@@ -38,7 +44,7 @@ class Album(models.Model):
     autor = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='albums_by_autor')
     tytul = models.CharField(max_length=50)
     rok_wydania = models.SmallIntegerField()
-    wiecej_info = models.TextField()
+    wiecej_info = models.TextField(null=True)
 
     def __str__(self):
         autor = Autor.objects.filter(autor_id=self.autor_id).first()
@@ -70,7 +76,7 @@ class Utwor(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='songs_in_album')
     tytul = models.CharField(max_length=60)
     gatunek = models.CharField(max_length=30)
-    dlugosc = models.TimeField(null=True)
+    tekst = models.CharField(max_length=5000)
     plik_sciezka = models.CharField(max_length=60)
 
     @staticmethod
