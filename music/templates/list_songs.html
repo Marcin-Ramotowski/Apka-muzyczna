@@ -1,0 +1,15 @@
+{% extends 'start.html' %}
+{% load static %}
+{% block content %}
+    <h2> {{ header }} {{ collection }}</h2>
+    {% for song in songs %}
+        <div class="w3-panel smooth-gray"><p>{{ song }}</p>
+            <audio controls class="audio-controller">
+              <source src="{{ song.get_play_url }}" type="audio/mpeg">
+              Twoja przeglądarka nie wspiera odtwarzacza audio.
+            </audio>
+            <a class="w3-purple w3-button download-button" href="{{ song.get_download_url }}">Pobierz</a>
+        </div>
+    {% endfor %}
+
+{% endblock %}

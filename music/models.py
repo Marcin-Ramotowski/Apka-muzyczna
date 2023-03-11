@@ -1,7 +1,6 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import AbstractUser
-from django.shortcuts import get_object_or_404
 
 
 class Autor(models.Model):
@@ -47,8 +46,7 @@ class Album(models.Model):
     wiecej_info = models.TextField(null=True)
 
     def __str__(self):
-        autor = Autor.objects.filter(autor_id=self.autor_id).first()
-        return f'"{self.tytul}" {autor}'
+        return f'"{self.tytul}" {self.autor}'
 
     @staticmethod
     def search(query):
@@ -76,7 +74,7 @@ class Utwor(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='songs_in_album')
     tytul = models.CharField(max_length=60)
     gatunek = models.CharField(max_length=30)
-    tekst = models.CharField(max_length=5000)
+    tekst = models.CharField(max_length=5000, default='')
     plik_sciezka = models.CharField(max_length=60)
 
     @staticmethod
@@ -100,8 +98,7 @@ class Utwor(models.Model):
         return reverse('music:play', args=[self.plik_sciezka])
 
     def __str__(self):
-        autor = Autor.objects.filter(autor_id=self.autor_id).first()
-        return f'"{self.tytul}" {autor}'
+        return f'"{self.tytul}" {self.autor}'
 
 
 class Uzytkownik(AbstractUser):
@@ -128,8 +125,7 @@ class Playlista(models.Model):
     nazwa = models.CharField(max_length=100)
 
     def __str__(self):
-        user = Uzytkownik.objects.filter(id=self.uzytkownik_id).first()
-        return f'"{self.nazwa}" {user}'
+        return f'"{self.nazwa}" {self.uzytkownik}'
 
     @staticmethod
     def search(query):
@@ -149,6 +145,12 @@ class BibliotekaPlaylist(models.Model):
     playlista = models.ForeignKey(Playlista, on_delete=models.CASCADE, related_name='songs_in_playlist')
     utwor = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='playlists_with_song')
 
+    def __str__(self):
+        return str(self.utwor)
+
+    def get_play_url(self):
+        return reverse('music:play', args=[self.utwor.plik_sciezka])
+
 
 class Subskrypcja(models.Model):
     class Meta:
@@ -157,10 +159,6 @@ class Subskrypcja(models.Model):
     id = models.AutoField(primary_key=True)
     uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='subscriptions_user')
     autor = models.ForeignKey(Autor, on_delete=models.CASCADE, related_name='subscriptions_author')
-
-    def __str__(self):
-        subskrypcja = get_object_or_404(Autor, autor_id=self.autor_id)
-        return str(subskrypcja)
 
     def get_unsubscribe_url(self):
         return reverse('music:unlike', args=['autor', self.id])
@@ -174,19 +172,11 @@ class BibliotekaPiosenek(models.Model):
     utwor = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='songs_in_library')
     uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_songs_library')
 
-    def get_song(self):
-        return get_object_or_404(Utwor, utwor_id=self.utwor_id)
-
-    def __str__(self):
-        return str(self.get_song())
-
     def get_download_url(self):
-        song = self.get_song()
-        return song.get_download_url()
+        return self.utwor.get_download_url()
 
     def get_play_url(self):
-        song = self.get_song()
-        return song.get_play_url()
+        return self.utwor.get_play_url()
 
     def get_unlike_url(self):
         return reverse('music:unlike', args=['utwor', self.id])
@@ -200,12 +190,11 @@ class BibliotekaAlbumow(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='albums_in_library')
     uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_albums_library')
 
-    def __str__(self):
-        albums = get_object_or_404(Album, album_id=self.album_id)
-        return str(albums)
-
     def get_unlike_url(self):
         return reverse('music:unlike', args=['album', self.id])
+
+    def get_songs(self):
+        return reverse('music:songs', args=['album', self.album_id])
 
 
 class PlaylistyUzytkownika(models.Model):
@@ -216,9 +205,8 @@ class PlaylistyUzytkownika(models.Model):
     playlista = models.ForeignKey(Playlista, on_delete=models.CASCADE, related_name='playlists_in_library')
     uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_playlists_library')
 
-    def __str__(self):
-        playlists = get_object_or_404(Playlista, playlista_id=self.playlista_id)
-        return str(playlists)
-
     def get_unlike_url(self):
         return reverse('music:unlike', args=['playlista', self.id])
+
+    def get_songs(self):
+        return reverse('music:songs', args=['playlista', self.playlista_id])

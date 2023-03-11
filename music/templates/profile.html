@@ -1,9 +1,5 @@
 {% extends 'start.html' %}
 {% load static %}
-{% block css %}
-    <link rel="stylesheet" href="{% static 'base.css' %}">
-    <link rel="stylesheet" href="{% static 'w3.css' %}">
-{% endblock %}
 {% block content %}
 <body>
     {% if user.is_authenticated %}
@@ -16,7 +12,7 @@
         <h2>Biblioteka</h2>
         <h3>Ulubione piosenki:</h3>
         {% for song in songs %}
-            <div class="w3-panel smooth-gray"><p>{{ song }}</p>
+            <div class="w3-panel smooth-gray"><p>{{ song.utwor }}</p>
                 <audio controls class="audio-controller">
                   <source src="{{ song.get_play_url }}" type="audio/mpeg">
                   Twoja przeglądarka nie wspiera odtwarzacza audio.
@@ -27,23 +23,24 @@
         {% endfor %}
         <h3>Ulubieni artyści:</h3>
         {% for author in authors %}
-            <div class="w3-panel smooth-gray">{{ author }}
-            <a class="w3-red w3-button unlike-button2" href="{{ author.get_unsubscribe_url }}">Usuń</a>
+            <div class="w3-panel smooth-gray">{{ author.autor }}
+            <a class="w3-red w3-button button-margin" href="{{ author.get_unsubscribe_url }}">Usuń</a>
             </div>
         {% endfor %}
         <h3>Ulubione albumy:</h3>
         {% for album in albums %}
-            <div class="w3-panel smooth-gray" >{{ album }}
-                <a class="w3-red w3-button unlike-button2" href="{{ album.get_unlike_url }}">Usuń</a>
+            <div class="w3-panel smooth-gray" >{{ album.album }}
+                <a class="w3-red w3-button button-margin" href="{{ album.get_unlike_url }}">Usuń</a>
+                <a class="w3-blue w3-button button-margin" href="{{ album.get_songs }}">Zobacz piosenki</a>
             </div>
         {% endfor %}
         <h3>Ulubione playlisty:</h3>
         {% for playlist in playlists %}
-            <div class="w3-panel smooth-gray">{{ playlist }}
-                <a class="w3-red w3-button unlike-button2" href="{{ playlist.get_unlike_url }}">Usuń</a>
+            <div class="w3-panel smooth-gray">{{ playlist.playlista }}
+                <a class="w3-red w3-button button-margin" href="{{ playlist.get_unlike_url }}">Usuń</a>
+                <a class="w3-blue w3-button button-margin" href="{{ playlist.get_songs }}">Zobacz piosenki</a>
             </div>
         {% endfor %}
     {% endif %}
-</div>
 </body>
 {% endblock %}

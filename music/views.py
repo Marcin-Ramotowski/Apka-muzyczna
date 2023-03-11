@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
-from django.http import StreamingHttpResponse, FileResponse
+from django.http import StreamingHttpResponse, FileResponse, Http404
 from Apka_muzyczna.settings import BASE_DIR, MEDIA_URL
 from .forms import SearchForm, RegisterForm, UploadForm
 from .models import Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja, \
@@ -76,6 +76,21 @@ def play(request, filename):
     response = FileResponse(file, content_type='audio/mpeg')
     response['Content-Length'] = os.path.getsize(file_path)
     return response
+
+
+@login_required(login_url='/login')
+def display_songs(request, model_name, record_id):
+    if model_name == 'album':
+        collection = get_object_or_404(Album, album_id=record_id)
+        songs = collection.songs_in_album.all()
+        header = 'Album '
+    elif model_name == 'playlista':
+        collection = get_object_or_404(Playlista, playlista_id=record_id)
+        songs = collection.songs_in_playlist.all()
+        header = 'Playlista '
+    else:
+        raise Http404('Podany typ obiektu nie jest zbiorem piosenek.')
+    return render(request, 'list_songs.html', {'header': header, 'collection': collection, 'songs': songs})
 
 
 class UploadView(LoginRequiredMixin, FormView):
