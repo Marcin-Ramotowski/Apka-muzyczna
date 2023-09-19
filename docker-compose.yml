@@ -2,6 +2,9 @@ version: '3.7'
 
 services:
   web:
+    container_name: muse
     build: .
     ports:
       - "8000:8000"
+    volumes:
+      - ./db.sqlite3:/app/db.sqlite3
