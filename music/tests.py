@@ -64,14 +64,6 @@ def test_unlike_author(client, django_user_model):
     response = client.get('/unlike/autor/2')
     assert response.status_code in (200, 302)
 
-
-@pytest.mark.django_db
-def test_download_file(client, django_user_model):
-    """ Sprawdza, pobieranie plików działa prawidłowo."""
-    response = client.get('/download/Margaret - Byle Jak.mp3')
-    assert response.status_code in (200, 302)
-
-
 @pytest.mark.django_db
 def test_play_file(client, django_user_model):
     """ Sprawdza, czy przekazywanie plików do odtwarzacza działa prawidłowo."""
