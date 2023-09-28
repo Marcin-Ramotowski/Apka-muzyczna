@@ -17,10 +17,11 @@
                   <source src="{{ song.get_play_url }}" type="audio/mpeg">
                   Twoja przeglądarka nie wspiera odtwarzacza audio.
                 </audio>
-                <a class="w3-purple w3-button download-button" href="{{ song.get_download_url }}">Pobierz</a>
+                <a class="w3-purple w3-button download-button" href="{{ song.get_text_url }}">Tekst</a>
                 <a class="w3-red w3-button unlike-button" href="{{ song.get_unlike_url }}">Usuń</a>
             </div>
         {% endfor %}
+
         <h3>Ulubieni artyści:</h3>
         {% for author in authors %}
             <div class="w3-panel smooth-gray">{{ author.autor }}
@@ -34,6 +35,7 @@
                 <a class="w3-blue w3-button button-margin" href="{{ album.get_songs }}">Zobacz piosenki</a>
             </div>
         {% endfor %}
+
         <h3>Ulubione playlisty:</h3>
         {% for playlist in playlists %}
             <div class="w3-panel smooth-gray">{{ playlist.playlista }}
@@ -41,6 +43,7 @@
                 <a class="w3-blue w3-button button-margin" href="{{ playlist.get_songs }}">Zobacz piosenki</a>
             </div>
         {% endfor %}
+
     {% endif %}
 </body>
 {% endblock %}

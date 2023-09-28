@@ -74,7 +74,7 @@ class Utwor(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='songs_in_album')
     tytul = models.CharField(max_length=60)
     gatunek = models.CharField(max_length=30)
-    tekst = models.CharField(max_length=5000, default='')
+    tekst_sciezka = models.CharField(max_length=5000, default='')
     plik_sciezka = models.CharField(max_length=60)
 
     @staticmethod
@@ -88,8 +88,8 @@ class Utwor(models.Model):
         )
         return results
 
-    def get_download_url(self):
-        return reverse('music:download', args=[self.plik_sciezka])
+    def get_text_url(self):
+        return reverse('music:text', args=[self.utwor_id])
 
     def get_like_url(self):
         return reverse('music:like', args=['utwor', self.utwor_id])
@@ -180,6 +180,9 @@ class BibliotekaPiosenek(models.Model):
 
     def get_unlike_url(self):
         return reverse('music:unlike', args=['utwor', self.id])
+
+    def get_text_url(self):
+        return self.utwor.get_text_url()
 
 
 class BibliotekaAlbumow(models.Model):

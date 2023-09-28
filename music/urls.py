@@ -12,5 +12,6 @@ urlpatterns = [
     path('like/<str:model_name>/<int:record_id>', views.like, name='like'),
     path('unlike/<str:model_name>/<int:record_id>', views.unlike, name='unlike'),
     path('play/<str:filename>', views.play, name='play'),
-    path('songs/<str:model_name>/<int:record_id>', views.display_songs, name='songs')
+    path('songs/<str:model_name>/<int:record_id>', views.display_songs, name='songs'),
+    path('text/<int:record_id>', views.display_text, name='text')
 ]

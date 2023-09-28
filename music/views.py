@@ -33,6 +33,15 @@ def profile(request):
 
 
 @login_required(login_url='/login')
+def display_text(request, record_id):
+    song = get_object_or_404(Utwor, utwor_id=record_id)
+    path = 'music/static/tekst/' + song.tekst_sciezka
+    with open(path, 'r', encoding='utf-8') as file:
+        text = file.readlines()
+    return render(request, 'song_text.html', {'song': song, 'text': text})
+
+
+@login_required(login_url='/login')
 def download_file(request, filename):
     fl_path = MEDIA_URL + filename
     fl = open(fl_path, 'rb')
