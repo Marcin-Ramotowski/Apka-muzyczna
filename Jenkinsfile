@@ -28,6 +28,7 @@ pipeline {
                 }
                 failure {
                     echo "Container do not started correctly"
+                    sh 'docker logs muse'
                 }
             }
         }
