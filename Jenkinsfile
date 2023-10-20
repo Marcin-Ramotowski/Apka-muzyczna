@@ -12,6 +12,7 @@ pipeline {
                     sh '''
                     echo "SECRET_KEY=$(head -c 64 /dev/urandom | base64 | tr -d '/+=')" > .env
                     docker-compose up -d
+                    docker exec muse python manage.py migrate
                     '''
                 }
             }
