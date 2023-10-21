@@ -61,7 +61,7 @@ def test_unlike_author(client, django_user_model):
                                   wiecej_info="polska piosenkarka, kompozytorka i autorka tekstów piosenek,"
                                               " z wykształcenia projektantka mody")
     Subskrypcja.objects.create(autor_id=author.autor_id, uzytkownik_id=user.id)
-    response = client.get('/unlike/autor/2')
+    response = client.get('/unlike/autor/1')
     assert response.status_code in (200, 302)
 
 @pytest.mark.django_db
