@@ -36,10 +36,11 @@ pipeline {
         stage('Test python app') {
             steps {
                 sh 'docker exec muse pytest . --junit-xml=pytest_junit.xml'
+                sh 'docker cp muse:/app/pytest_junit.xml .'
             }
             post {
                 always {
-                    junit testResults: '**/*pytest_junit.xml'
+                    junit testResults: 'pytest_junit.xml'
                 }
             }
         }
