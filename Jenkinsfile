@@ -47,9 +47,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh 'docker tag python-django-app_web registry.byst.re/muse:latest'
-                    docker.withRegistry('https://registry.byst.re', '3c074810-ffdd-48a5-87c3-6f44051fca6d') {
-                    sh 'docker push registry.byst.re/muse:latest'
+                    sh 'docker tag python-django-app_web <registry_url>/muse:latest'
+                    docker.withRegistry('<registry_url>', '<credentials-id>') {
+                    sh 'docker push <registry_url>/muse:latest'
                         }
                     }
                 }
