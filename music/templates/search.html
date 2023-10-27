@@ -1,9 +1,5 @@
 {% extends 'start.html' %}
 {% load static %}
-{% block css %}
-    <link rel="stylesheet" href="{% static 'base.css' %}">
-    <link rel="stylesheet" href="{% static 'w3.css' %}">
-{% endblock %}
 {% block content %}
     <form method="post">
         {{ form.as_p }}
