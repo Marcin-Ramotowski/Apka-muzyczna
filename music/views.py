@@ -34,9 +34,16 @@ def profile(request):
     authors = user.subscriptions_user.all()
     albums = user.user_albums_library.all()
     playlists = user.user_playlists_library.all()
+    owned_playlists = Playlista.objects.filter(uzytkownik=user)
 
-    return render(request, 'profile.html', {'username': username, 'songs': songs, 'authors': authors,
-                                            'albums': albums, 'playlists': playlists})
+    return render(request, 'profile.html', {
+        'username': username,
+        'songs': songs,
+        'authors': authors,
+        'albums': albums,
+        'playlists': playlists,
+        'owned_playlists': owned_playlists,
+    })
 
 
 @login_required(login_url='/login')
@@ -334,8 +341,8 @@ class SearchFormView(LoginRequiredMixin, FormView):
         models = {'autor': Autor, 'piosenka': Utwor, 'album': Album, 'playlista': Playlista}
         form = self.form_class(request.POST)
         query = form.data['query']
-        database_sign = form.data['database']  # pobieramy wybraną przez użytkownika tabelę
-        model = models[database_sign]  # pobieramy klasę reprezentującą wybraną tabelę
+        database_sign = form.data['database']
+        model = models[database_sign]
         results = model.search(query)
         return render(request, self.template_name, {'form': form, 'results': results, 'model': database_sign})
 

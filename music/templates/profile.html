@@ -6,8 +6,17 @@
         <p class="w3-text-black">Witaj, {{ username }}</p>
             <p class="w3-text-black">Zapraszam Cię do świata ekscytujących doznań słuchowych,
                 w którym odprężysz się przy dźwiękach swoich ulubionych utworów. :)</p>
-        <a class="w3-orange w3-button" href="{% url 'music:upload' %}">Dodaj muzę</a>
-        <a class="w3-blue w3-button" href="{% url 'music:search' %}">Szukaj</a>
+
+        <div class="w3-bar w3-margin-bottom">
+            <a class="w3-orange w3-button" href="{% url 'music:upload' %}">Dodaj muzę</a>
+            <a class="w3-blue w3-button" href="{% url 'music:search' %}">Szukaj</a>
+            <a class="w3-teal w3-button" href="{% url 'music:history' %}">Historia odsłuchań</a>
+            <a class="w3-purple w3-button" href="{% url 'music:create_playlist' %}">Nowa playlista</a>
+            <a class="w3-indigo w3-button" href="{% url 'music:add_song_to_playlist' %}">Dodaj do playlisty</a>
+            <a class="w3-green w3-button" href="{% url 'music:recommendations' %}">Rekomendacje ★</a>
+            <a class="w3-deep-orange w3-button" href="{% url 'music:play_random_liked' %}">Losuj z ulubionych ▶</a>
+            <a class="w3-grey w3-button" href="{% url 'password_reset' %}">Zresetuj hasło</a>
+        </div>
 
         <h2>Biblioteka</h2>
         <h3>Ulubione piosenki:</h3>
@@ -28,6 +37,7 @@
             <a class="w3-red w3-button button-margin" href="{{ author.get_unsubscribe_url }}">Usuń</a>
             </div>
         {% endfor %}
+
         <h3>Ulubione albumy:</h3>
         {% for album in albums %}
             <div class="w3-panel smooth-gray" >{{ album.album }}
@@ -42,6 +52,18 @@
                 <a class="w3-red w3-button button-margin" href="{{ playlist.get_unlike_url }}">Usuń</a>
                 <a class="w3-blue w3-button button-margin" href="{{ playlist.get_songs }}">Zobacz piosenki</a>
             </div>
+        {% endfor %}
+
+        <h3>Moje playlisty:</h3>
+        {% for pl in owned_playlists %}
+            <div class="w3-panel smooth-gray">{{ pl.nazwa }}
+                <a class="w3-blue w3-button button-margin" href="{% url 'music:songs' 'playlista' pl.playlista_id %}">
+                    Zobacz piosenki
+                </a>
+            </div>
+        {% empty %}
+            <p class="w3-text-gray">Nie masz jeszcze żadnej playlisty.
+               <a href="{% url 'music:create_playlist' %}">Utwórz pierwszą!</a></p>
         {% endfor %}
 
     {% endif %}
