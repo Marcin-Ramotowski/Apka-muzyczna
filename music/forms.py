@@ -13,10 +13,8 @@ class AutorField(forms.Field):
 
     def validate(self, value):
         super().validate(value)
-        name = value.get('name')
-        surname = value.get('surname')
-        if not name.isalpha() or not surname.isalpha():
-            raise ValidationError('Podaj prawidłowe imię i nazwisko')
+        if not value.get('name'):
+            raise ValidationError('Pole autora nie może być puste.')
 
     def clean(self, value):
         result = super().clean(value)
