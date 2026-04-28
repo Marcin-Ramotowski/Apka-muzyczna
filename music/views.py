@@ -277,7 +277,6 @@ def play_random_liked(request):
         return redirect('music:profile')
 
     song = liked.utwor
-    ListeningHistory.objects.create(uzytkownik=request.user, utwor=song)
     return render(request, 'play_random_liked.html', {'song': song})
 
 
