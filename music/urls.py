@@ -15,4 +15,5 @@ urlpatterns = [
     path('songs/<str:model_name>/<int:record_id>', views.display_songs, name='songs'),
     path('text/<int:record_id>', views.display_text, name='text'),
     path('history/', views.history, name='history'),
+    path('recommendations/', views.recommendations, name='recommendations'),
 ]

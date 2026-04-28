@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse, FileResponse, Http404
@@ -124,6 +125,36 @@ def history(request):
             entries = entries.filter(played_at__date__lte=date_to)
 
     return render(request, 'history.html', {'form': form, 'entries': entries})
+
+
+@login_required(login_url='/login')
+def recommendations(request):
+    user = request.user
+    liked_genres = (
+        BibliotekaPiosenek.objects
+        .filter(uzytkownik=user)
+        .values_list('utwor__gatunek', flat=True)
+    )
+    subscribed_author_ids = (
+        Subskrypcja.objects
+        .filter(uzytkownik=user)
+        .values_list('autor_id', flat=True)
+    )
+    already_liked_ids = (
+        BibliotekaPiosenek.objects
+        .filter(uzytkownik=user)
+        .values_list('utwor_id', flat=True)
+    )
+
+    recommended = (
+        Utwor.objects
+        .filter(Q(gatunek__in=liked_genres) | Q(autor_id__in=subscribed_author_ids))
+        .exclude(utwor_id__in=already_liked_ids)
+        .select_related('autor', 'album')
+        .distinct()[:20]
+    )
+
+    return render(request, 'recommendations.html', {'songs': recommended})
 
 
 class UploadView(LoginRequiredMixin, FormView):

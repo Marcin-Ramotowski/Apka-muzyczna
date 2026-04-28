@@ -1,0 +1,22 @@
+{% extends 'start.html' %}
+{% block content %}
+<h2>Rekomendacje dla Ciebie</h2>
+<p class="w3-text-gray">Na podstawie Twoich polubionych utworów i subskrybowanych artystów.</p>
+{% if songs %}
+    {% for song in songs %}
+    <div class="w3-panel w3-light-gray">
+        <p><strong>{{ song.tytul }}</strong> — {{ song.autor }} ({{ song.gatunek }})</p>
+        <audio controls class="audio-controller">
+            <source src="{{ song.get_play_url }}" type="audio/mpeg">
+            Twoja przeglądarka nie wspiera odtwarzacza audio.
+        </audio>
+        <a class="w3-green w3-button" href="{{ song.get_like_url }}">Polub</a>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="w3-panel w3-yellow">
+        <p>Nie mamy jeszcze wystarczająco danych, by przygotować rekomendacje.
+           Polub kilka utworów lub zasubskrybuj artystów!</p>
+    </div>
+{% endif %}
+{% endblock %}
