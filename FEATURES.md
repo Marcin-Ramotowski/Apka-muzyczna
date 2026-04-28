@@ -12,7 +12,7 @@ Status legend: `[x]` implemented · `[ ]` planned / not yet implemented
 | 2 | Login | `[x]` | `POST /login/` |
 | 3 | Logout | `[x]` | `POST /logout/` |
 | 4 | Account types: free / premium | `[x]` | — (model field) |
-| 5 | Password reset | `[ ]` | — |
+| 5 | Password reset (email z linkiem, szablony registration/) | `[x]` | `GET/POST /accounts/password_reset/` |
 
 ---
 
@@ -64,7 +64,12 @@ Status legend: `[x]` implemented · `[ ]` planned / not yet implemented
 | 26 | Auto-create author record if not found | `[x]` | — |
 | 27 | Auto-create album record if not found | `[x]` | — |
 | 28 | Duplicate song guard (blocks re-upload of same author + title) | `[x]` | — |
-| 29 | Upload song lyrics | `[ ]` | — |
+| 29 | Upload song lyrics via textarea (limit 10 000 znaków) | `[x]` | `GET/POST /text/upload/<id>` |
+| 35 | Listening history with date filter | `[x]` | `GET /history/` |
+| 36 | Song recommendations based on likes & subscriptions | `[x]` | `GET /recommendations/` |
+| 37 | Create playlist (unique name per user) | `[x]` | `GET/POST /playlist/create/` |
+| 38 | Add song to playlist (ownership check, duplicate guard) | `[x]` | `GET/POST /playlist/add-song/` |
+| 39 | Play random liked song | `[x]` | `GET /play-random-liked/` |
 
 ---
 
@@ -82,6 +87,7 @@ Status legend: `[x]` implemented · `[ ]` planned / not yet implemented
 | `BibliotekaPiosenek` | M2M: user ↔ liked songs |
 | `BibliotekaAlbumow` | M2M: user ↔ liked albums |
 | `PlaylistyUzytkownika` | M2M: user ↔ saved playlists |
+| `ListeningHistory` | Records each song play with timestamp |
 
 ---
 
