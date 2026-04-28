@@ -24,7 +24,7 @@ def start(request):
     return render(request, 'start.html')
 
 
-@login_required(login_url='/login')
+@login_required
 def profile(request):
     username = request.user
     user_id = request.user.id
@@ -46,7 +46,7 @@ def profile(request):
     })
 
 
-@login_required(login_url='/login')
+@login_required
 def display_text(request, record_id):
     song = get_object_or_404(Utwor, utwor_id=record_id)
     text = []
@@ -61,7 +61,7 @@ def display_text(request, record_id):
     return render(request, 'song_text.html', {'song': song, 'text': text})
 
 
-@login_required(login_url='/login')
+@login_required
 def download_file(request, filename):
     fl_path = MEDIA_URL + filename
     fl = open(fl_path, 'rb')
@@ -71,7 +71,7 @@ def download_file(request, filename):
     return response
 
 
-@login_required(login_url='/login')
+@login_required
 def like(request, model_name, record_id):
     models = {'autor': Subskrypcja, 'utwor': BibliotekaPiosenek, 'album': BibliotekaAlbumow,
               'playlista': PlaylistyUzytkownika}
@@ -88,7 +88,7 @@ def like(request, model_name, record_id):
     return redirect('music:search')
 
 
-@login_required(login_url='/login')
+@login_required
 def unlike(request, model_name, record_id):
     models = {'autor': Subskrypcja, 'utwor': BibliotekaPiosenek, 'album': BibliotekaAlbumow,
               'playlista': PlaylistyUzytkownika}
@@ -98,7 +98,7 @@ def unlike(request, model_name, record_id):
     return redirect('music:profile')
 
 
-@login_required(login_url='/login')
+@login_required
 def play(request, filename):
     file_path = MEDIA_URL + filename
     file = open(file_path, 'rb')
@@ -112,7 +112,7 @@ def play(request, filename):
     return response
 
 
-@login_required(login_url='/login')
+@login_required
 def display_songs(request, model_name, record_id):
     if model_name == 'album':
         collection = get_object_or_404(Album, album_id=record_id)
@@ -127,7 +127,7 @@ def display_songs(request, model_name, record_id):
     return render(request, 'list_songs.html', {'header': header, 'collection': collection, 'songs': songs})
 
 
-@login_required(login_url='/login')
+@login_required
 def history(request):
     form = HistoryFilterForm(request.GET or None)
     entries = request.user.listening_history.select_related('utwor', 'utwor__autor')
@@ -143,7 +143,7 @@ def history(request):
     return render(request, 'history.html', {'form': form, 'entries': entries})
 
 
-@login_required(login_url='/login')
+@login_required
 def recommendations(request):
     user = request.user
     liked_genres = (
@@ -173,7 +173,7 @@ def recommendations(request):
     return render(request, 'recommendations.html', {'songs': recommended})
 
 
-@login_required(login_url='/login')
+@login_required
 def create_playlist(request):
     if request.method == 'POST':
         form = PlaylistForm(request.POST)
@@ -199,7 +199,7 @@ def create_playlist(request):
     return render(request, 'create_playlist.html', {'form': form})
 
 
-@login_required(login_url='/login')
+@login_required
 def add_song_to_playlist(request):
     user = request.user
 
@@ -236,7 +236,7 @@ def add_song_to_playlist(request):
     })
 
 
-@login_required(login_url='/login')
+@login_required
 def upload_text(request, record_id):
     song = get_object_or_404(Utwor, utwor_id=record_id)
 
@@ -259,7 +259,7 @@ def upload_text(request, record_id):
     return render(request, 'upload_text.html', {'form': form, 'song': song})
 
 
-@login_required(login_url='/login')
+@login_required
 def play_random_liked(request):
     liked = (
         BibliotekaPiosenek.objects
@@ -278,7 +278,7 @@ def play_random_liked(request):
 
 
 class UploadView(LoginRequiredMixin, FormView):
-    login_url = '/login'
+    login_url = '/accounts/login'
     template_name = 'upload.html'
     form_class = UploadForm
 
@@ -335,7 +335,7 @@ class BaseLogoutView(LogoutView):
 
 
 class SearchFormView(LoginRequiredMixin, FormView):
-    login_url = '/login'
+    login_url = '/accounts/login'
     template_name = 'search.html'
     form_class = SearchForm
 
