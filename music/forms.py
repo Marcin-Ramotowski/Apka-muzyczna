@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from itertools import zip_longest
 from .models import Uzytkownik
+import datetime
 
 
 class AutorField(forms.Field):
@@ -21,22 +22,6 @@ class AutorField(forms.Field):
         result = super().clean(value)
         return result
 
-
-class AlbumField(forms.Field):
-    def to_python(self, value):
-        fields = ['title', 'published_year']
-        return dict(zip_longest(fields, value.split(', '))) if value else {}
-
-    def validate(self, value):
-        super().validate(value)
-        year = value.get('published_year')
-        if not year.isdigit():
-            raise ValidationError('Rok wydania podany po przecinku musi być liczbą',
-                                  params={'album': 'niepoprawny rok'})
-
-    def clean(self, value):
-        result = super().clean(value)
-        return result
 
 
 class LoginForm(forms.Form):
@@ -65,7 +50,12 @@ class UploadForm(forms.Form):
     title = forms.CharField(max_length=30, label='Tytuł')
     genre = forms.CharField(max_length=20, label='Gatunek')
     autor = AutorField(label='Autor', widget=forms.TextInput(attrs={'placeholder': 'Imię nazwisko pseudonim'}))
-    album = AlbumField(label='Album', widget=forms.TextInput(attrs={'placeholder': 'Tytuł, rok wydania'}))
+    album_title = forms.CharField(max_length=50, label='Tytuł albumu')
+    album_year = forms.IntegerField(
+        label='Rok wydania albumu',
+        min_value=1900,
+        max_value=datetime.date.today().year,
+    )
     file = forms.FileField(widget=forms.ClearableFileInput)
 
 

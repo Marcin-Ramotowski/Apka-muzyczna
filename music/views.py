@@ -286,9 +286,8 @@ class UploadView(LoginRequiredMixin, FormView):
             name = autor_data.get('name')
             surname = autor_data.get('surname')
             nick = autor_data.get('nick')
-            album_data = cd['album']
-            album_title = album_data.get('title')
-            year_publishing = album_data.get('published_year')
+            album_title = cd['album_title']
+            year_publishing = cd['album_year']
 
             autor = Autor.objects.filter(imie=name, nazwisko=surname).first()
             if not autor:
