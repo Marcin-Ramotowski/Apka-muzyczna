@@ -16,4 +16,5 @@ urlpatterns = [
     path('text/<int:record_id>', views.display_text, name='text'),
     path('history/', views.history, name='history'),
     path('recommendations/', views.recommendations, name='recommendations'),
+    path('playlist/create/', views.create_playlist, name='create_playlist'),
 ]

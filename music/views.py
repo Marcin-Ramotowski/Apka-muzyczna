@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse, FileResponse, Http404
 from Apka_muzyczna.settings import BASE_DIR, MEDIA_URL
-from .forms import SearchForm, RegisterForm, UploadForm, HistoryFilterForm
+from .forms import SearchForm, RegisterForm, UploadForm, HistoryFilterForm, PlaylistForm
 from .models import (
     Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja,
     BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow,
@@ -155,6 +155,32 @@ def recommendations(request):
     )
 
     return render(request, 'recommendations.html', {'songs': recommended})
+
+
+@login_required(login_url='/login')
+def create_playlist(request):
+    if request.method == 'POST':
+        form = PlaylistForm(request.POST)
+        if form.is_valid():
+            try:
+                form.validate_unique_for_user(request.user)
+            except Exception as e:
+                messages.error(request, str(e))
+                return render(request, 'create_playlist.html', {'form': form})
+
+            playlist = Playlista.objects.create(
+                uzytkownik=request.user,
+                nazwa=form.cleaned_data['name'],
+            )
+            PlaylistyUzytkownika.objects.create(
+                uzytkownik=request.user,
+                playlista=playlist,
+            )
+            messages.success(request, f'Playlista „{playlist.nazwa}" została utworzona.')
+            return redirect('music:profile')
+    else:
+        form = PlaylistForm()
+    return render(request, 'create_playlist.html', {'form': form})
 
 
 class UploadView(LoginRequiredMixin, FormView):

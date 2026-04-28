@@ -69,6 +69,16 @@ class UploadForm(forms.Form):
     file = forms.FileField(widget=forms.ClearableFileInput)
 
 
+class PlaylistForm(forms.Form):
+    name = forms.CharField(max_length=100, label='Nazwa playlisty')
+
+    def validate_unique_for_user(self, user):
+        from .models import Playlista
+        name = self.cleaned_data.get('name')
+        if Playlista.objects.filter(uzytkownik=user, nazwa=name).exists():
+            raise Exception('Masz już playlistę o tej nazwie.')
+
+
 class HistoryFilterForm(forms.Form):
     date_from = forms.DateField(
         required=False, label='Od',

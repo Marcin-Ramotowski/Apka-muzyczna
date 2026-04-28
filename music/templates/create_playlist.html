@@ -1,0 +1,10 @@
+{% extends 'start.html' %}
+{% block content %}
+<h2>Nowa playlista</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input class="w3-button w3-orange" type="submit" value="Utwórz">
+    <a class="w3-button w3-light-grey" href="{% url 'music:profile' %}">Anuluj</a>
+</form>
+{% endblock %}
