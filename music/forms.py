@@ -67,3 +67,48 @@ class UploadForm(forms.Form):
     autor = AutorField(label='Autor', widget=forms.TextInput(attrs={'placeholder': 'Imię nazwisko pseudonim'}))
     album = AlbumField(label='Album', widget=forms.TextInput(attrs={'placeholder': 'Tytuł, rok wydania'}))
     file = forms.FileField(widget=forms.ClearableFileInput)
+
+
+class LyricsUploadForm(forms.Form):
+    lyrics = forms.CharField(
+        max_length=10_000,
+        label='Tekst piosenki (maks. 10 000 znaków)',
+        widget=forms.Textarea,
+    )
+
+
+class AddSongToPlaylistForm(forms.Form):
+    playlist_id = forms.IntegerField(widget=forms.HiddenInput, required=False)
+    song_id = forms.IntegerField(label='ID utworu')
+
+    def clean(self):
+        from .models import Playlista, Utwor
+        cleaned = super().clean()
+        playlist_id = cleaned.get('playlist_id')
+        song_id = cleaned.get('song_id')
+        if playlist_id and not Playlista.objects.filter(pk=playlist_id).exists():
+            raise forms.ValidationError('Wybrana playlista nie istnieje.')
+        if song_id and not Utwor.objects.filter(pk=song_id).exists():
+            raise forms.ValidationError('Wybrany utwór nie istnieje.')
+        return cleaned
+
+
+class PlaylistForm(forms.Form):
+    name = forms.CharField(max_length=100, label='Nazwa playlisty')
+
+    def validate_unique_for_user(self, user):
+        from .models import Playlista
+        name = self.cleaned_data.get('name')
+        if Playlista.objects.filter(uzytkownik=user, nazwa=name).exists():
+            raise Exception('Masz już playlistę o tej nazwie.')
+
+
+class HistoryFilterForm(forms.Form):
+    date_from = forms.DateField(
+        required=False, label='Od',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+    )
+    date_to = forms.DateField(
+        required=False, label='Do',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+    )

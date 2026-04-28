@@ -3,13 +3,20 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse, FileResponse, Http404
 from Apka_muzyczna.settings import BASE_DIR, MEDIA_URL
-from .forms import SearchForm, RegisterForm, UploadForm
-from .models import Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja, \
-    BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow
+from .forms import (
+    SearchForm, RegisterForm, UploadForm,
+    HistoryFilterForm, PlaylistForm, AddSongToPlaylistForm, LyricsUploadForm,
+)
+from .models import (
+    Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja,
+    BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow,
+    BibliotekaPlaylist, ListeningHistory,
+)
 import os
 
 
@@ -27,9 +34,16 @@ def profile(request):
     authors = user.subscriptions_user.all()
     albums = user.user_albums_library.all()
     playlists = user.user_playlists_library.all()
+    owned_playlists = Playlista.objects.filter(uzytkownik=user)
 
-    return render(request, 'profile.html', {'username': username, 'songs': songs, 'authors': authors,
-                                            'albums': albums, 'playlists': playlists})
+    return render(request, 'profile.html', {
+        'username': username,
+        'songs': songs,
+        'authors': authors,
+        'albums': albums,
+        'playlists': playlists,
+        'owned_playlists': owned_playlists,
+    })
 
 
 @login_required(login_url='/login')
@@ -84,6 +98,11 @@ def play(request, filename):
     file = open(file_path, 'rb')
     response = FileResponse(file, content_type='audio/mpeg')
     response['Content-Length'] = os.path.getsize(file_path)
+
+    song = Utwor.objects.filter(plik_sciezka=filename).first()
+    if song:
+        ListeningHistory.objects.create(uzytkownik=request.user, utwor=song)
+
     return response
 
 
@@ -100,6 +119,156 @@ def display_songs(request, model_name, record_id):
     else:
         raise Http404('Podany typ obiektu nie jest zbiorem piosenek.')
     return render(request, 'list_songs.html', {'header': header, 'collection': collection, 'songs': songs})
+
+
+@login_required(login_url='/login')
+def history(request):
+    form = HistoryFilterForm(request.GET or None)
+    entries = request.user.listening_history.select_related('utwor', 'utwor__autor')
+
+    if form.is_valid():
+        date_from = form.cleaned_data.get('date_from')
+        date_to = form.cleaned_data.get('date_to')
+        if date_from:
+            entries = entries.filter(played_at__date__gte=date_from)
+        if date_to:
+            entries = entries.filter(played_at__date__lte=date_to)
+
+    return render(request, 'history.html', {'form': form, 'entries': entries})
+
+
+@login_required(login_url='/login')
+def recommendations(request):
+    user = request.user
+    liked_genres = (
+        BibliotekaPiosenek.objects
+        .filter(uzytkownik=user)
+        .values_list('utwor__gatunek', flat=True)
+    )
+    subscribed_author_ids = (
+        Subskrypcja.objects
+        .filter(uzytkownik=user)
+        .values_list('autor_id', flat=True)
+    )
+    already_liked_ids = (
+        BibliotekaPiosenek.objects
+        .filter(uzytkownik=user)
+        .values_list('utwor_id', flat=True)
+    )
+
+    recommended = (
+        Utwor.objects
+        .filter(Q(gatunek__in=liked_genres) | Q(autor_id__in=subscribed_author_ids))
+        .exclude(utwor_id__in=already_liked_ids)
+        .select_related('autor', 'album')
+        .distinct()[:20]
+    )
+
+    return render(request, 'recommendations.html', {'songs': recommended})
+
+
+@login_required(login_url='/login')
+def create_playlist(request):
+    if request.method == 'POST':
+        form = PlaylistForm(request.POST)
+        if form.is_valid():
+            try:
+                form.validate_unique_for_user(request.user)
+            except Exception as e:
+                messages.error(request, str(e))
+                return render(request, 'create_playlist.html', {'form': form})
+
+            playlist = Playlista.objects.create(
+                uzytkownik=request.user,
+                nazwa=form.cleaned_data['name'],
+            )
+            PlaylistyUzytkownika.objects.create(
+                uzytkownik=request.user,
+                playlista=playlist,
+            )
+            messages.success(request, f'Playlista „{playlist.nazwa}" została utworzona.')
+            return redirect('music:profile')
+    else:
+        form = PlaylistForm()
+    return render(request, 'create_playlist.html', {'form': form})
+
+
+@login_required(login_url='/login')
+def add_song_to_playlist(request):
+    user = request.user
+
+    if request.method == 'POST':
+        form = AddSongToPlaylistForm(request.POST)
+        if form.is_valid():
+            playlist_id = form.cleaned_data['playlist_id']
+            song_id = form.cleaned_data['song_id']
+
+            playlist = get_object_or_404(Playlista, pk=playlist_id)
+            if playlist.uzytkownik != user:
+                messages.error(request, 'Nie masz uprawnień do tej playlisty.')
+                return redirect('music:profile')
+
+            song = get_object_or_404(Utwor, pk=song_id)
+            already_in = BibliotekaPlaylist.objects.filter(playlista=playlist, utwor=song).exists()
+            if already_in:
+                messages.info(request, 'Utwór już znajduje się na tej playliście.')
+            else:
+                BibliotekaPlaylist.objects.create(playlista=playlist, utwor=song)
+                messages.success(request, f'Dodano „{song.tytul}" do playlisty „{playlist.nazwa}".')
+            return redirect('music:profile')
+        else:
+            for error in form.errors.values():
+                messages.error(request, error.as_text()[2:])
+
+    user_playlists = Playlista.objects.filter(uzytkownik=user)
+    all_songs = Utwor.objects.select_related('autor').all()
+    form = AddSongToPlaylistForm()
+    return render(request, 'add_song_to_playlist.html', {
+        'form': form,
+        'user_playlists': user_playlists,
+        'all_songs': all_songs,
+    })
+
+
+@login_required(login_url='/login')
+def upload_text(request, record_id):
+    song = get_object_or_404(Utwor, utwor_id=record_id)
+
+    if request.method == 'POST':
+        form = LyricsUploadForm(request.POST)
+        if form.is_valid():
+            lyrics = form.cleaned_data['lyrics']
+            filename = f'song_{record_id}.txt'
+            tekst_dir = BASE_DIR / 'music' / 'static' / 'tekst'
+            tekst_dir.mkdir(parents=True, exist_ok=True)
+            with open(tekst_dir / filename, 'w', encoding='utf-8') as f:
+                f.write(lyrics)
+            song.tekst_sciezka = filename
+            song.save()
+            messages.success(request, 'Tekst piosenki został zapisany.')
+            return redirect('music:profile')
+    else:
+        form = LyricsUploadForm()
+
+    return render(request, 'upload_text.html', {'form': form, 'song': song})
+
+
+@login_required(login_url='/login')
+def play_random_liked(request):
+    liked = (
+        BibliotekaPiosenek.objects
+        .filter(uzytkownik=request.user)
+        .select_related('utwor', 'utwor__autor', 'utwor__album')
+        .order_by('?')
+        .first()
+    )
+    if not liked:
+        messages.info(request, 'Nie masz jeszcze żadnych polubionych utworów.')
+        return redirect('music:profile')
+
+    song = liked.utwor
+    ListeningHistory.objects.create(uzytkownik=request.user, utwor=song)
+    return render(request, 'play_random_liked.html', {'song': song})
 
 
 class UploadView(LoginRequiredMixin, FormView):
@@ -172,8 +341,8 @@ class SearchFormView(LoginRequiredMixin, FormView):
         models = {'autor': Autor, 'piosenka': Utwor, 'album': Album, 'playlista': Playlista}
         form = self.form_class(request.POST)
         query = form.data['query']
-        database_sign = form.data['database']  # pobieramy wybraną przez użytkownika tabelę
-        model = models[database_sign]  # pobieramy klasę reprezentującą wybraną tabelę
+        database_sign = form.data['database']
+        model = models[database_sign]
         results = model.search(query)
         return render(request, self.template_name, {'form': form, 'results': results, 'model': database_sign})
 

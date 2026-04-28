@@ -1,0 +1,29 @@
+{% extends 'start.html' %}
+{% block content %}
+<h2>Dodaj utwór do playlisty</h2>
+<form method="post">
+    {% csrf_token %}
+    <p>
+        <label for="id_playlist_id">Playlista:</label>
+        <select name="playlist_id" id="id_playlist_id" required>
+            {% for pl in user_playlists %}
+                <option value="{{ pl.playlista_id }}">{{ pl.nazwa }}</option>
+            {% empty %}
+                <option disabled>Brak Twoich playlist — najpierw utwórz playlistę</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <label for="id_song_id">Utwór (ID):</label>
+        <input type="number" name="song_id" id="id_song_id" min="1" required>
+    </p>
+    <p class="w3-text-gray w3-small">Dostępne utwory:</p>
+    <ul class="w3-ul w3-small" style="max-height:200px;overflow-y:auto">
+        {% for song in all_songs %}
+            <li>ID {{ song.utwor_id }} — {{ song.tytul }} ({{ song.autor }})</li>
+        {% endfor %}
+    </ul>
+    <input class="w3-button w3-orange w3-margin-top" type="submit" value="Dodaj">
+    <a class="w3-button w3-light-grey w3-margin-top" href="{% url 'music:profile' %}">Anuluj</a>
+</form>
+{% endblock %}

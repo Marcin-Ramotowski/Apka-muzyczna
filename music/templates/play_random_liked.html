@@ -1,0 +1,19 @@
+{% extends 'start.html' %}
+{% block content %}
+<h2>Losowy utwór z ulubionych</h2>
+<div class="w3-panel smooth-gray">
+    <h3>{{ song.tytul }}</h3>
+    <p>{{ song.autor }} {% if song.album %}· {{ song.album }}{% endif %} · {{ song.gatunek }}</p>
+    <audio controls autoplay class="audio-controller">
+        <source src="{% url 'music:play' song.plik_sciezka %}" type="audio/mpeg">
+        Twoja przeglądarka nie wspiera odtwarzacza audio.
+    </audio>
+    <div class="w3-margin-top">
+        {% if song.tekst_sciezka %}
+            <a class="w3-purple w3-button" href="{% url 'music:text' song.utwor_id %}">Tekst</a>
+        {% endif %}
+        <a class="w3-orange w3-button" href="{% url 'music:play_random_liked' %}">Losuj ponownie</a>
+        <a class="w3-blue w3-button" href="{% url 'music:profile' %}">Profil</a>
+    </div>
+</div>
+{% endblock %}
