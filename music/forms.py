@@ -1,24 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-from itertools import zip_longest
 from .models import Uzytkownik
 import datetime
 
 
-class AutorField(forms.Field):
-    def to_python(self, value):
-        fields = ['name', 'surname', 'nick']
-        return dict(zip_longest(fields, value.split())) if value else {}
-
-    def validate(self, value):
-        super().validate(value)
-        if not value.get('name'):
-            raise ValidationError('Pole autora nie może być puste.')
-
-    def clean(self, value):
-        result = super().clean(value)
-        return result
+class AutorField(forms.CharField):
+    pass
 
 
 
@@ -47,7 +35,7 @@ class RegisterForm(UserCreationForm):
 class UploadForm(forms.Form):
     title = forms.CharField(max_length=30, label='Tytuł')
     genre = forms.CharField(max_length=20, label='Gatunek')
-    autor = AutorField(label='Autor', widget=forms.TextInput(attrs={'placeholder': 'Imię nazwisko pseudonim'}))
+    autor = AutorField(max_length=100, label='Artysta', widget=forms.TextInput(attrs={'placeholder': 'Nazwa artysty lub zespołu'}))
     album_title = forms.CharField(max_length=50, label='Tytuł albumu')
     album_year = forms.IntegerField(
         label='Rok wydania albumu',

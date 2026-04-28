@@ -288,16 +288,13 @@ class UploadView(LoginRequiredMixin, FormView):
             cd = form.cleaned_data
             song_title = cd['title']
             genre = cd['genre']
-            autor_data = cd['autor']
-            name = autor_data.get('name')
-            surname = autor_data.get('surname')
-            nick = autor_data.get('nick')
+            artist_name = cd['autor']
             album_title = cd['album_title']
             year_publishing = cd['album_year']
 
-            autor = Autor.objects.filter(imie=name, nazwisko=surname).first()
+            autor = Autor.objects.filter(pseudonim=artist_name).first()
             if not autor:
-                autor = Autor.objects.create(imie=name, nazwisko=surname, pseudonim=nick)
+                autor = Autor.objects.create(pseudonim=artist_name)
             album = Album.objects.filter(tytul=album_title, rok_wydania=year_publishing).first()
             if not album:
                 album = Album.objects.create(autor_id=autor.autor_id, tytul=album_title, rok_wydania=year_publishing)
