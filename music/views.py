@@ -246,6 +246,24 @@ def upload_text(request, record_id):
     return render(request, 'upload_text.html', {'form': form, 'song': song})
 
 
+@login_required(login_url='/login')
+def play_random_liked(request):
+    liked = (
+        BibliotekaPiosenek.objects
+        .filter(uzytkownik=request.user)
+        .select_related('utwor', 'utwor__autor', 'utwor__album')
+        .order_by('?')
+        .first()
+    )
+    if not liked:
+        messages.info(request, 'Nie masz jeszcze żadnych polubionych utworów.')
+        return redirect('music:profile')
+
+    song = liked.utwor
+    ListeningHistory.objects.create(uzytkownik=request.user, utwor=song)
+    return render(request, 'play_random_liked.html', {'song': song})
+
+
 class UploadView(LoginRequiredMixin, FormView):
     login_url = '/login'
     template_name = 'upload.html'

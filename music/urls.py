@@ -19,4 +19,5 @@ urlpatterns = [
     path('playlist/create/', views.create_playlist, name='create_playlist'),
     path('playlist/add-song/', views.add_song_to_playlist, name='add_song_to_playlist'),
     path('text/upload/<int:record_id>', views.upload_text, name='upload_text'),
+    path('play-random-liked/', views.play_random_liked, name='play_random_liked'),
 ]
