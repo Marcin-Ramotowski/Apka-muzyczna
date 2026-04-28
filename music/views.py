@@ -8,11 +8,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse, FileResponse, Http404
 from Apka_muzyczna.settings import BASE_DIR, MEDIA_URL
-from .forms import SearchForm, RegisterForm, UploadForm, HistoryFilterForm, PlaylistForm
+from .forms import SearchForm, RegisterForm, UploadForm, HistoryFilterForm, PlaylistForm, AddSongToPlaylistForm
 from .models import (
     Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja,
     BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow,
-    ListeningHistory,
+    BibliotekaPlaylist, ListeningHistory,
 )
 import os
 
@@ -181,6 +181,43 @@ def create_playlist(request):
     else:
         form = PlaylistForm()
     return render(request, 'create_playlist.html', {'form': form})
+
+
+@login_required(login_url='/login')
+def add_song_to_playlist(request):
+    user = request.user
+
+    if request.method == 'POST':
+        form = AddSongToPlaylistForm(request.POST)
+        if form.is_valid():
+            playlist_id = form.cleaned_data['playlist_id']
+            song_id = form.cleaned_data['song_id']
+
+            playlist = get_object_or_404(Playlista, pk=playlist_id)
+            if playlist.uzytkownik != user:
+                messages.error(request, 'Nie masz uprawnień do tej playlisty.')
+                return redirect('music:profile')
+
+            song = get_object_or_404(Utwor, pk=song_id)
+            already_in = BibliotekaPlaylist.objects.filter(playlista=playlist, utwor=song).exists()
+            if already_in:
+                messages.info(request, 'Utwór już znajduje się na tej playliście.')
+            else:
+                BibliotekaPlaylist.objects.create(playlista=playlist, utwor=song)
+                messages.success(request, f'Dodano „{song.tytul}" do playlisty „{playlist.nazwa}".')
+            return redirect('music:profile')
+        else:
+            for error in form.errors.values():
+                messages.error(request, error.as_text()[2:])
+
+    user_playlists = Playlista.objects.filter(uzytkownik=user)
+    all_songs = Utwor.objects.select_related('autor').all()
+    form = AddSongToPlaylistForm()
+    return render(request, 'add_song_to_playlist.html', {
+        'form': form,
+        'user_playlists': user_playlists,
+        'all_songs': all_songs,
+    })
 
 
 class UploadView(LoginRequiredMixin, FormView):

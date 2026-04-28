@@ -17,4 +17,5 @@ urlpatterns = [
     path('history/', views.history, name='history'),
     path('recommendations/', views.recommendations, name='recommendations'),
     path('playlist/create/', views.create_playlist, name='create_playlist'),
+    path('playlist/add-song/', views.add_song_to_playlist, name='add_song_to_playlist'),
 ]

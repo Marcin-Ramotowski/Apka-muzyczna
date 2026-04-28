@@ -69,6 +69,22 @@ class UploadForm(forms.Form):
     file = forms.FileField(widget=forms.ClearableFileInput)
 
 
+class AddSongToPlaylistForm(forms.Form):
+    playlist_id = forms.IntegerField(widget=forms.HiddenInput, required=False)
+    song_id = forms.IntegerField(label='ID utworu')
+
+    def clean(self):
+        from .models import Playlista, Utwor
+        cleaned = super().clean()
+        playlist_id = cleaned.get('playlist_id')
+        song_id = cleaned.get('song_id')
+        if playlist_id and not Playlista.objects.filter(pk=playlist_id).exists():
+            raise forms.ValidationError('Wybrana playlista nie istnieje.')
+        if song_id and not Utwor.objects.filter(pk=song_id).exists():
+            raise forms.ValidationError('Wybrany utwór nie istnieje.')
+        return cleaned
+
+
 class PlaylistForm(forms.Form):
     name = forms.CharField(max_length=100, label='Nazwa playlisty')
 
