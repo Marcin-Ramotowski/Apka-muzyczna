@@ -69,6 +69,14 @@ class UploadForm(forms.Form):
     file = forms.FileField(widget=forms.ClearableFileInput)
 
 
+class LyricsUploadForm(forms.Form):
+    lyrics = forms.CharField(
+        max_length=10_000,
+        label='Tekst piosenki (maks. 10 000 znaków)',
+        widget=forms.Textarea,
+    )
+
+
 class AddSongToPlaylistForm(forms.Form):
     playlist_id = forms.IntegerField(widget=forms.HiddenInput, required=False)
     song_id = forms.IntegerField(label='ID utworu')

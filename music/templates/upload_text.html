@@ -1,0 +1,11 @@
+{% extends 'start.html' %}
+{% block content %}
+<h2>Tekst piosenki: {{ song.tytul }}</h2>
+<p class="w3-text-gray">Autor: {{ song.autor }}</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input class="w3-button w3-purple" type="submit" value="Zapisz tekst">
+    <a class="w3-button w3-light-grey" href="{% url 'music:profile' %}">Anuluj</a>
+</form>
+{% endblock %}

@@ -8,7 +8,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse, FileResponse, Http404
 from Apka_muzyczna.settings import BASE_DIR, MEDIA_URL
-from .forms import SearchForm, RegisterForm, UploadForm, HistoryFilterForm, PlaylistForm, AddSongToPlaylistForm
+from .forms import (
+    SearchForm, RegisterForm, UploadForm,
+    HistoryFilterForm, PlaylistForm, AddSongToPlaylistForm, LyricsUploadForm,
+)
 from .models import (
     Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja,
     BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow,
@@ -218,6 +221,29 @@ def add_song_to_playlist(request):
         'user_playlists': user_playlists,
         'all_songs': all_songs,
     })
+
+
+@login_required(login_url='/login')
+def upload_text(request, record_id):
+    song = get_object_or_404(Utwor, utwor_id=record_id)
+
+    if request.method == 'POST':
+        form = LyricsUploadForm(request.POST)
+        if form.is_valid():
+            lyrics = form.cleaned_data['lyrics']
+            filename = f'song_{record_id}.txt'
+            tekst_dir = BASE_DIR / 'music' / 'static' / 'tekst'
+            tekst_dir.mkdir(parents=True, exist_ok=True)
+            with open(tekst_dir / filename, 'w', encoding='utf-8') as f:
+                f.write(lyrics)
+            song.tekst_sciezka = filename
+            song.save()
+            messages.success(request, 'Tekst piosenki został zapisany.')
+            return redirect('music:profile')
+    else:
+        form = LyricsUploadForm()
+
+    return render(request, 'upload_text.html', {'form': form, 'song': song})
 
 
 class UploadView(LoginRequiredMixin, FormView):
