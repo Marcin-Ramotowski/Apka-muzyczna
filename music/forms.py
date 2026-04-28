@@ -67,3 +67,14 @@ class UploadForm(forms.Form):
     autor = AutorField(label='Autor', widget=forms.TextInput(attrs={'placeholder': 'Imię nazwisko pseudonim'}))
     album = AlbumField(label='Album', widget=forms.TextInput(attrs={'placeholder': 'Tytuł, rok wydania'}))
     file = forms.FileField(widget=forms.ClearableFileInput)
+
+
+class HistoryFilterForm(forms.Form):
+    date_from = forms.DateField(
+        required=False, label='Od',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+    )
+    date_to = forms.DateField(
+        required=False, label='Do',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+    )

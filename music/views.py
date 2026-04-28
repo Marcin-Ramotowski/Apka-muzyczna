@@ -7,9 +7,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
 from django.http import StreamingHttpResponse, FileResponse, Http404
 from Apka_muzyczna.settings import BASE_DIR, MEDIA_URL
-from .forms import SearchForm, RegisterForm, UploadForm
-from .models import Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja, \
-    BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow
+from .forms import SearchForm, RegisterForm, UploadForm, HistoryFilterForm
+from .models import (
+    Autor, Album, Utwor, Uzytkownik, Playlista, Subskrypcja,
+    BibliotekaPiosenek, PlaylistyUzytkownika, BibliotekaAlbumow,
+    ListeningHistory,
+)
 import os
 
 
@@ -84,6 +87,11 @@ def play(request, filename):
     file = open(file_path, 'rb')
     response = FileResponse(file, content_type='audio/mpeg')
     response['Content-Length'] = os.path.getsize(file_path)
+
+    song = Utwor.objects.filter(plik_sciezka=filename).first()
+    if song:
+        ListeningHistory.objects.create(uzytkownik=request.user, utwor=song)
+
     return response
 
 
@@ -100,6 +108,22 @@ def display_songs(request, model_name, record_id):
     else:
         raise Http404('Podany typ obiektu nie jest zbiorem piosenek.')
     return render(request, 'list_songs.html', {'header': header, 'collection': collection, 'songs': songs})
+
+
+@login_required(login_url='/login')
+def history(request):
+    form = HistoryFilterForm(request.GET or None)
+    entries = request.user.listening_history.select_related('utwor', 'utwor__autor')
+
+    if form.is_valid():
+        date_from = form.cleaned_data.get('date_from')
+        date_to = form.cleaned_data.get('date_to')
+        if date_from:
+            entries = entries.filter(played_at__date__gte=date_from)
+        if date_to:
+            entries = entries.filter(played_at__date__lte=date_to)
+
+    return render(request, 'history.html', {'form': form, 'entries': entries})
 
 
 class UploadView(LoginRequiredMixin, FormView):

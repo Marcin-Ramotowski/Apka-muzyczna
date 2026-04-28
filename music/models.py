@@ -120,7 +120,7 @@ class Playlista(models.Model):
     class Meta:
         db_table = "playlista"
 
-    playlista_id = models.IntegerField(primary_key=True)
+    playlista_id = models.AutoField(primary_key=True)
     uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='playlists')
     nazwa = models.CharField(max_length=100)
 
@@ -213,3 +213,17 @@ class PlaylistyUzytkownika(models.Model):
 
     def get_songs(self):
         return reverse('music:songs', args=['playlista', self.playlista_id])
+
+
+class ListeningHistory(models.Model):
+    class Meta:
+        db_table = 'listening_history'
+        ordering = ['-played_at']
+
+    id = models.AutoField(primary_key=True)
+    uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='listening_history')
+    utwor = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='play_history')
+    played_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.uzytkownik} — {self.utwor} ({self.played_at:%Y-%m-%d %H:%M})'
