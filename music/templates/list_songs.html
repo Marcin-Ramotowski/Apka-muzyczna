@@ -10,6 +10,8 @@
             </audio>
             <a class="w3-purple w3-button download-button" href="{{ song.get_download_url }}">Pobierz</a>
         </div>
+    {% empty %}
+        <p class="w3-text-gray">Nie ma jeszcze piosenek. Dodaj pierwszą!</p>
     {% endfor %}
 
 {% endblock %}
