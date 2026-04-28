@@ -4,7 +4,7 @@
 <div class="w3-panel smooth-gray">
     <h3>{{ song.tytul }}</h3>
     <p>{{ song.autor }} {% if song.album %}· {{ song.album }}{% endif %} · {{ song.gatunek }}</p>
-    <audio controls autoplay preload="none" class="audio-controller">
+    <audio controls autoplay class="audio-controller">
         <source src="{% url 'music:play' song.plik_sciezka %}" type="audio/mpeg">
         Twoja przeglądarka nie wspiera odtwarzacza audio.
     </audio>

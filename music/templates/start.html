@@ -53,4 +53,22 @@
 </div>
 </body>
 {%  endblock %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('audio[data-song-id]').forEach(function (audio) {
+        var logged = false;
+        audio.addEventListener('play', function () {
+            if (logged) return;
+            logged = true;
+            var cookie = document.cookie.split(';').map(function (c) { return c.trim(); })
+                .find(function (c) { return c.startsWith('csrftoken='); });
+            var csrfToken = cookie ? cookie.split('=')[1] : '';
+            fetch('/history/record/' + audio.dataset.songId + '/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken }
+            });
+        });
+    });
+});
+</script>
 </html>

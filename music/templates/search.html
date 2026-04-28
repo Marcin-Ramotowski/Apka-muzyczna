@@ -12,7 +12,7 @@
             {% for result in results %}
             <div class="w3-panel w3-light-gray"><p>{{ result }}</p>
                 {% if model == 'piosenka' %}
-                    <audio controls preload="none" class="audio-controller">
+                    <audio controls class="audio-controller" data-song-id="{{ result.utwor_id }}">
                         <source src="{{ result.get_play_url }}" type="audio/mpeg">
                         Twoja przeglądarka nie wspiera odtwarzacza audio.
                     </audio>

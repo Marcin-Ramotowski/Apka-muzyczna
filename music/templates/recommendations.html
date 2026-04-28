@@ -6,7 +6,7 @@
     {% for song in songs %}
     <div class="w3-panel w3-light-gray">
         <p><strong>{{ song.tytul }}</strong> — {{ song.autor }} ({{ song.gatunek }})</p>
-        <audio controls preload="none" class="audio-controller">
+        <audio controls class="audio-controller" data-song-id="{{ song.utwor_id }}">
             <source src="{{ song.get_play_url }}" type="audio/mpeg">
             Twoja przeglądarka nie wspiera odtwarzacza audio.
         </audio>

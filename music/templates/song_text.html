@@ -3,7 +3,7 @@
 {% block content %}
     <h2 class="w3-container w3-grayscale-min"> {{ song }} </h2>
         <div class="w3-panel smooth-gray">
-            <audio controls preload="none" class="audio-controller">
+            <audio controls class="audio-controller" data-song-id="{{ song.utwor_id }}">
                 <source src="{{ song.get_play_url }}" type="audio/mpeg">
                 Twoja przeglądarka nie wspiera odtwarzacza audio.
             </audio>

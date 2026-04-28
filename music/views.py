@@ -6,7 +6,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
-from django.http import StreamingHttpResponse, FileResponse, Http404
+from django.http import StreamingHttpResponse, FileResponse, Http404, JsonResponse
 from Apka_muzyczna.settings import BASE_DIR, MEDIA_URL
 from .forms import (
     SearchForm, RegisterForm, UploadForm,
@@ -104,12 +104,16 @@ def play(request, filename):
     file = open(file_path, 'rb')
     response = FileResponse(file, content_type='audio/mpeg')
     response['Content-Length'] = os.path.getsize(file_path)
-
-    song = Utwor.objects.filter(plik_sciezka=filename).first()
-    if song:
-        ListeningHistory.objects.create(uzytkownik=request.user, utwor=song)
-
     return response
+
+
+@login_required
+def record_play(request, song_id):
+    if request.method == 'POST':
+        song = get_object_or_404(Utwor, pk=song_id)
+        ListeningHistory.objects.create(uzytkownik=request.user, utwor=song)
+        return JsonResponse({'status': 'ok'})
+    return JsonResponse({'error': 'method not allowed'}, status=405)
 
 
 @login_required
