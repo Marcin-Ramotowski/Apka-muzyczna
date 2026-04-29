@@ -1,10 +1,13 @@
 {% extends 'start.html' %}
+{% load crispy_forms_tags %}
+
 {% block content %}
-    {% load crispy_forms_tags %}
+<h2>Dodaj piosenkę</h2>
+<div class="w3-panel" style="max-width:520px">
     <form enctype="multipart/form-data" method="post">
-    <h3>Załaduj swoją piosenkę:</h3>
-    <div>{{ form|crispy }}</div>
-    {% csrf_token %}
-    <input class="submit-button" type="submit" value="Prześlij">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input class="w3-button submit-button" type="submit" value="Prześlij">
     </form>
+</div>
 {% endblock %}

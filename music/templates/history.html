@@ -1,33 +1,36 @@
 {% extends 'start.html' %}
+
 {% block content %}
 <h2>Historia odsłuchań</h2>
 <form method="get">
     {{ form.as_p }}
     <input class="w3-button w3-blue" type="submit" value="Filtruj">
-    <a class="w3-button w3-light-grey" href="{% url 'music:history' %}">Wyczyść</a>
+    <a class="w3-button w3-grey" href="{% url 'music:history' %}">Wyczyść</a>
 </form>
 <hr>
 {% if entries %}
-    <table class="w3-table w3-striped w3-bordered w3-margin-top">
-        <thead>
-            <tr class="w3-blue">
-                <th>Data i godzina</th>
-                <th>Utwór</th>
-                <th>Autor</th>
-                <th>Album</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for entry in entries %}
-            <tr>
-                <td>{{ entry.played_at|date:"Y-m-d H:i" }}</td>
-                <td>{{ entry.utwor.tytul }}</td>
-                <td>{{ entry.utwor.autor }}</td>
-                <td>{{ entry.utwor.album.tytul }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div style="overflow-x:auto">
+        <table class="w3-table w3-striped w3-bordered w3-margin-top">
+            <thead>
+                <tr class="w3-blue">
+                    <th>Data i godzina</th>
+                    <th>Utwór</th>
+                    <th>Autor</th>
+                    <th>Album</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td>{{ entry.played_at|date:"Y-m-d H:i" }}</td>
+                    <td>{{ entry.utwor.tytul }}</td>
+                    <td>{{ entry.utwor.autor }}</td>
+                    <td>{{ entry.utwor.album.tytul }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
     <div class="w3-panel w3-light-gray"><p>Brak historii odsłuchań.</p></div>
 {% endif %}

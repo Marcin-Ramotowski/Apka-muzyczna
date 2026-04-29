@@ -1,37 +1,35 @@
 {% extends 'start.html' %}
 {% load static %}
+
 {% block content %}
-    <form method="post">
-        {{ form.as_p }}
-        {% csrf_token %}
-        <input type="submit" value="Szukaj">
-    </form>
-    {% if results %}
-        <h3>Wyniki:</h3>
-        <div>
-            {% for result in results %}
-            <div class="w3-panel w3-light-gray"><p>{{ result }}</p>
-                {% if model == 'piosenka' %}
-                    <audio controls class="audio-controller" data-song-id="{{ result.utwor_id }}">
-                        <source src="{{ result.get_play_url }}" type="audio/mpeg">
-                        Twoja przeglądarka nie wspiera odtwarzacza audio.
-                    </audio>
-                    <a class="w3-purple w3-button download-button" href="{{ result.get_text_url }}">Tekst</a>
-                    <a class="w3-green w3-button like-button" href="{{ result.get_like_url }}">Polub</a>
-                {% endif %}
-                {% if model == 'autor' %}
-                    <a class="w3-green w3-button" href="{{ result.get_subscribe_url }}">Subskrybuj</a>
-                {% endif %}
-                {% if model == 'album' %}
-                    <a class="w3-green w3-button" href="{{ result.get_like_url }}">Polub</a>
-                {% endif %}
-                {% if model == 'playlista' %}
-                    <a class="w3-green w3-button" href="{{ result.get_like_url }}">Polub</a>
-                {% endif %}
-                </div>
-            {%  endfor %}
-        </div>
-        {% else %}
-            <div class="w3-panel w3-light-gray"><p>Brak wyników.</p>
-    {% endif %}
+<h2>Wyszukaj</h2>
+<form method="post">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <input class="w3-button" type="submit" value="Szukaj">
+</form>
+
+{% if results %}
+    <h3>Wyniki</h3>
+    {% for result in results %}
+    <div class="w3-panel">
+        <p>{{ result }}</p>
+        {% if model == 'piosenka' %}
+            <audio controls class="audio-controller" data-song-id="{{ result.utwor_id }}">
+                <source src="{{ result.get_play_url }}" type="audio/mpeg">
+            </audio>
+            <div style="margin-top:10px">
+                <a class="w3-button w3-purple download-button" href="{{ result.get_text_url }}">Tekst</a>
+                <a class="w3-button w3-green like-button" href="{{ result.get_like_url }}">Polub</a>
+            </div>
+        {% elif model == 'autor' %}
+            <a class="w3-button w3-green" href="{{ result.get_subscribe_url }}">Subskrybuj</a>
+        {% elif model == 'album' or model == 'playlista' %}
+            <a class="w3-button w3-green" href="{{ result.get_like_url }}">Polub</a>
+        {% endif %}
+    </div>
+    {% endfor %}
+{% elif request.method == 'POST' %}
+    <div class="w3-panel w3-light-gray"><p>Brak wyników.</p></div>
+{% endif %}
 {% endblock %}

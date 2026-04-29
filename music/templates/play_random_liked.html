@@ -1,19 +1,28 @@
 {% extends 'start.html' %}
+
 {% block content %}
 <h2>Losowy utwór z ulubionych</h2>
-<div class="w3-panel smooth-gray">
-    <h3>{{ song.tytul }}</h3>
-    <p>{{ song.autor }} {% if song.album %}· {{ song.album }}{% endif %} · {{ song.gatunek }}</p>
+<div class="w3-panel" style="max-width:600px">
+    <h3 style="font-size:1.1rem;color:var(--text-primary);text-transform:none;letter-spacing:normal;margin-top:0">
+        {{ song.tytul }}
+        <span class="eq-icon">
+            <span></span><span></span><span></span>
+        </span>
+    </h3>
+    <p class="w3-text-gray">
+        {{ song.autor }}
+        {% if song.album %} · {{ song.album }}{% endif %}
+        {% if song.gatunek %} · {{ song.gatunek }}{% endif %}
+    </p>
     <audio controls class="audio-controller" data-song-id="{{ song.utwor_id }}">
         <source src="{{ song.get_play_url }}" type="audio/mpeg">
-        Twoja przeglądarka nie wspiera odtwarzacza audio.
     </audio>
-    <div class="w3-margin-top">
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
         {% if song.tekst_sciezka %}
-            <a class="w3-purple w3-button" href="{% url 'music:text' song.utwor_id %}">Tekst</a>
+            <a class="w3-button w3-purple" href="{% url 'music:text' song.utwor_id %}">Tekst</a>
         {% endif %}
-        <a class="w3-orange w3-button" href="{% url 'music:play_random_liked' %}">Losuj ponownie</a>
-        <a class="w3-blue w3-button" href="{% url 'music:profile' %}">Profil</a>
+        <a class="w3-button w3-orange" href="{% url 'music:play_random_liked' %}">Losuj ponownie</a>
+        <a class="w3-button w3-grey"   href="{% url 'music:profile' %}">Profil</a>
     </div>
 </div>
 {% endblock %}

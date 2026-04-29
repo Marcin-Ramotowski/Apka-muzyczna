@@ -1,15 +1,12 @@
 {% extends 'start.html' %}
 {% load static %}
 
-{% block buttons %}
-{% endblock %}
-
 {% block content %}
 <form class="middle_form" action="{% url 'login' %}" method="post">
     <h2>Zaloguj się</h2>
-    <div>{{ form.as_p }}</div>
+    {{ form.as_p }}
     {% csrf_token %}
-    <p class="text-center">Nie masz u nas konta? <a href="{% url 'register' %}">Zarejestruj się</a>.</p>
-    <input type="submit" value="Zaloguj się">
+    <p>Nie masz u nas konta? <a href="{% url 'register' %}">Zarejestruj się</a>.</p>
+    <input class="w3-button" type="submit" value="Zaloguj się">
 </form>
 {% endblock %}
