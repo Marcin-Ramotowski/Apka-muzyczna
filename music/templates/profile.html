@@ -27,7 +27,9 @@
                 <source src="{{ song.get_play_url }}" type="audio/mpeg">
             </audio>
             <div style="margin-top:10px">
+                {% if song.utwor.tekst_sciezka %}
                 <a class="w3-button w3-purple download-button" href="{{ song.get_text_url }}">Tekst</a>
+                {% endif %}
                 <a class="w3-button w3-red unlike-button" href="{{ song.get_unlike_url }}">Usuń</a>
             </div>
         </div>

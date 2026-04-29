@@ -6,7 +6,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import FormView
-from django.http import StreamingHttpResponse, FileResponse, Http404, JsonResponse
+from django.http import FileResponse, Http404, JsonResponse
 from Apka_muzyczna.settings import BASE_DIR, MEDIA_URL
 from .forms import (
     SearchForm, RegisterForm, UploadForm,
@@ -61,15 +61,6 @@ def display_text(request, record_id):
     return render(request, 'song_text.html', {'song': song, 'text': text})
 
 
-@login_required
-def download_file(request, filename):
-    fl_path = MEDIA_URL + filename
-    fl = open(fl_path, 'rb')
-    response = StreamingHttpResponse(fl, content_type='audio/mpeg')
-    response['Content-Disposition'] = f"attachment; filename={filename}"
-    response['Content-Length'] = os.path.getsize(fl_path)
-    return response
-
 
 @login_required
 def like(request, model_name, record_id):
@@ -120,14 +111,28 @@ def record_play(request, song_id):
 def display_songs(request, model_name, record_id):
     if model_name == 'album':
         collection = get_object_or_404(Album, album_id=record_id)
-        songs = collection.songs_in_album.all()
-        header = 'Album '
+        songs = list(collection.songs_in_album.select_related('autor', 'album').all())
+        header = 'Album'
     elif model_name == 'playlista':
         collection = get_object_or_404(Playlista, playlista_id=record_id)
-        songs = collection.songs_in_playlist.all()
-        header = 'Playlista '
+        songs = [
+            bp.utwor for bp in
+            collection.songs_in_playlist.select_related('utwor', 'utwor__autor', 'utwor__album').all()
+        ]
+        header = 'Playlista'
     else:
         raise Http404('Podany typ obiektu nie jest zbiorem piosenek.')
+
+    song_ids = [s.utwor_id for s in songs]
+    liked_map = {
+        entry.utwor_id: entry.id
+        for entry in BibliotekaPiosenek.objects.filter(uzytkownik=request.user, utwor_id__in=song_ids)
+    }
+    for song in songs:
+        entry_id = liked_map.get(song.utwor_id)
+        song.is_liked = entry_id is not None
+        song.like_entry_id = entry_id
+
     return render(request, 'list_songs.html', {'header': header, 'collection': collection, 'songs': songs})
 
 

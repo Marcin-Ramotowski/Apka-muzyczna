@@ -10,7 +10,15 @@
             <source src="{{ song.get_play_url }}" type="audio/mpeg">
         </audio>
         <div style="margin-top:10px">
-            <a class="w3-button w3-purple download-button" href="{{ song.get_download_url }}">Pobierz</a>
+            {% if song.tekst_sciezka %}
+                <a class="w3-button w3-purple download-button" href="{{ song.get_text_url }}">Tekst</a>
+            {% endif %}
+            {% if song.is_liked %}
+                <a class="w3-button w3-red unlike-button"
+                   href="{% url 'music:unlike' 'utwor' song.like_entry_id %}">Usuń</a>
+            {% else %}
+                <a class="w3-button w3-green like-button" href="{{ song.get_like_url }}">Polub</a>
+            {% endif %}
         </div>
     </div>
 {% empty %}

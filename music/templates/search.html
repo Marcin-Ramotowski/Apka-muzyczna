@@ -19,7 +19,9 @@
                 <source src="{{ result.get_play_url }}" type="audio/mpeg">
             </audio>
             <div style="margin-top:10px">
+                {% if result.tekst_sciezka %}
                 <a class="w3-button w3-purple download-button" href="{{ result.get_text_url }}">Tekst</a>
+                {% endif %}
                 <a class="w3-button w3-green like-button" href="{{ result.get_like_url }}">Polub</a>
             </div>
         {% elif model == 'autor' %}

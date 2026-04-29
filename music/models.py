@@ -172,9 +172,6 @@ class BibliotekaPiosenek(models.Model):
     utwor = models.ForeignKey(Utwor, on_delete=models.CASCADE, related_name='songs_in_library')
     uzytkownik = models.ForeignKey(Uzytkownik, on_delete=models.CASCADE, related_name='user_songs_library')
 
-    def get_download_url(self):
-        return self.utwor.get_download_url()
-
     def get_play_url(self):
         return self.utwor.get_play_url()
 
