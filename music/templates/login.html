@@ -7,6 +7,7 @@
     {{ form.as_p }}
     {% csrf_token %}
     <p>Nie masz u nas konta? <a href="{% url 'register' %}">Zarejestruj się</a>.</p>
+    <p><a href="{% url 'password_reset' %}">Zapomniałem hasła</a></p>
     <input class="w3-button" type="submit" value="Zaloguj się">
 </form>
 {% endblock %}

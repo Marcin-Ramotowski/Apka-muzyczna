@@ -20,4 +20,5 @@ urlpatterns = [
     path('text/upload/<int:record_id>', views.upload_text, name='upload_text'),
     path('play-random-liked/', views.play_random_liked, name='play_random_liked'),
     path('history/record/<int:song_id>/', views.record_play, name='record_play'),
+    path('settings/', views.account_settings, name='settings'),
 ]

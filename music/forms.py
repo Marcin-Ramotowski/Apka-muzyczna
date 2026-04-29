@@ -79,6 +79,13 @@ class PlaylistForm(forms.Form):
             raise Exception('Masz już playlistę o tej nazwie.')
 
 
+class AccountSettingsForm(forms.ModelForm):
+    class Meta:
+        model = Uzytkownik
+        fields = ('first_name', 'last_name', 'email')
+        labels = {'first_name': 'Imię', 'last_name': 'Nazwisko', 'email': 'Adres e-mail'}
+
+
 class HistoryFilterForm(forms.Form):
     date_from = forms.DateField(
         required=False, label='Od',

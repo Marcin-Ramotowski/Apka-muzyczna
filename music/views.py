@@ -1,6 +1,7 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Q
@@ -9,7 +10,7 @@ from django.views.generic import FormView
 from django.http import FileResponse, Http404, JsonResponse
 from Apka_muzyczna.settings import BASE_DIR, MEDIA_URL
 from .forms import (
-    SearchForm, RegisterForm, UploadForm,
+    SearchForm, RegisterForm, UploadForm, AccountSettingsForm,
     HistoryFilterForm, PlaylistForm, AddSongToPlaylistForm, LyricsUploadForm,
 )
 from .models import (
@@ -283,6 +284,32 @@ def play_random_liked(request):
 
     song = liked.utwor
     return render(request, 'play_random_liked.html', {'song': song})
+
+
+@login_required
+def account_settings(request):
+    info_form = AccountSettingsForm(instance=request.user)
+    password_form = PasswordChangeForm(request.user)
+
+    if request.method == 'POST':
+        if 'save_info' in request.POST:
+            info_form = AccountSettingsForm(request.POST, instance=request.user)
+            if info_form.is_valid():
+                info_form.save()
+                messages.success(request, 'Dane zostały zaktualizowane.')
+                return redirect('music:settings')
+        elif 'change_password' in request.POST:
+            password_form = PasswordChangeForm(request.user, request.POST)
+            if password_form.is_valid():
+                password_form.save()
+                update_session_auth_hash(request, password_form.user)
+                messages.success(request, 'Hasło zostało zmienione.')
+                return redirect('music:settings')
+
+    return render(request, 'account_settings.html', {
+        'info_form': info_form,
+        'password_form': password_form,
+    })
 
 
 class UploadView(LoginRequiredMixin, FormView):

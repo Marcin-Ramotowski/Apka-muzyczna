@@ -1,0 +1,30 @@
+{% extends 'start.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2>Ustawienia konta</h2>
+
+<div class="w3-panel" style="max-width:520px">
+    <h3 style="font-size:0.9rem;color:var(--text-primary);text-transform:none;letter-spacing:normal;margin-top:0">
+        Dane osobowe
+    </h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ info_form|crispy }}
+        <input class="w3-button" type="submit" name="save_info" value="Zapisz zmiany">
+    </form>
+</div>
+
+<div class="w3-panel" style="max-width:520px">
+    <h3 style="font-size:0.9rem;color:var(--text-primary);text-transform:none;letter-spacing:normal;margin-top:0">
+        Zmiana hasła
+    </h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ password_form|crispy }}
+        <input class="w3-button" type="submit" name="change_password" value="Zmień hasło">
+    </form>
+</div>
+
+<a class="w3-button w3-grey" style="max-width:520px" href="{% url 'music:profile' %}">Wróć do profilu</a>
+{% endblock %}
