@@ -8,9 +8,9 @@ Status legend: `[x]` implemented · `[ ]` planned / not yet implemented
 
 | # | Feature | Status | Endpoint |
 |---|---------|--------|----------|
-| 1 | User registration (first name, last name, username, email, password) | `[x]` | `POST /register/` |
-| 2 | Login | `[x]` | `POST /login/` |
-| 3 | Logout | `[x]` | `POST /logout/` |
+| 1 | User registration (first name, last name, username, email, password) | `[x]` | `POST /accounts/register/` |
+| 2 | Login | `[x]` | `POST /accounts/login/` |
+| 3 | Logout | `[x]` | `POST /accounts/logout/` |
 | 4 | Account types: free / premium | `[x]` | — (model field) |
 | 5 | Password reset (email z linkiem, szablony registration/) | `[x]` | `GET/POST /accounts/password_reset/` |
 
@@ -49,7 +49,7 @@ Status legend: `[x]` implemented · `[ ]` planned / not yet implemented
 | # | Feature | Status | Endpoint |
 |---|---------|--------|----------|
 | 20 | Stream MP3 in browser | `[x]` | `GET /play/<filename>` |
-| 21 | Download MP3 file | `[x]` | `GET /download/<filename>` |
+| 21 | Download MP3 file | `[ ]` | `GET /download/<filename>` |
 | 22 | Display song lyrics | `[x]` | `GET /text/<id>` |
 | 23 | List songs in an album | `[x]` | `GET /songs/album/<id>` |
 | 24 | List songs in a playlist | `[x]` | `GET /songs/playlista/<id>` |
@@ -70,6 +70,7 @@ Status legend: `[x]` implemented · `[ ]` planned / not yet implemented
 | 37 | Create playlist (unique name per user) | `[x]` | `GET/POST /playlist/create/` |
 | 38 | Add song to playlist (ownership check, duplicate guard) | `[x]` | `GET/POST /playlist/add-song/` |
 | 39 | Play random liked song | `[x]` | `GET /play-random-liked/` |
+| 40 | Account settings (edit personal info, change password) | `[x]` | `GET/POST /settings/` |
 
 ---
 
