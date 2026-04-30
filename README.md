@@ -1,81 +1,106 @@
-Muse on the loose
+# Muza na luzie
 
-    Music service for listening to music
+Aplikacja muzyczna zbudowana w Django — strumieniowanie MP3, biblioteka ulubionych, playlisty i wyszukiwarka.
 
-Table of Contents
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Django](https://img.shields.io/badge/Django-4.1-green)
+![Docker](https://img.shields.io/badge/Docker-ready-2496ED)
+![Tests](https://img.shields.io/badge/tests-pytest-yellow)
 
-    General Info
-    Technologies Used
-    Features
-    Screenshots
-    Setup
-    Project Status
-    Room for Improvement
-    Acknowledgements
-    Contact
+---
 
-General Information
+## Funkcjonalności
 
-This is a music streaming application project 
-that was created to put my programming skills
-to the next level. There is a great adventure 
-for me with Python in Django.
+- **Odtwarzanie** — strumieniowanie MP3 w przeglądarce, losowe odtwarzanie polubionych, historia odsłuchań
+- **Wyszukiwanie** — pełnotekstowe przeszukiwanie piosenek, artystów, albumów i playlist
+- **Biblioteka** — polubione piosenki, albumy i playlisty; subskrypcje artystów
+- **Upload** — dodawanie plików MP3 z metadanymi; auto-tworzenie artysty i albumu; upload tekstów piosenek
+- **Playlisty** — tworzenie playlist i dodawanie do nich piosenek
+- **Rekomendacje** — propozycje oparte o polubienia i subskrypcje
+- **Konto** — rejestracja, logowanie, reset hasła przez e-mail, ustawienia profilu, plan free/premium
 
-Technologies Used
+---
 
-    Python                version 3.10
-    Django                version 4.1.5
-    django-crispy-forms   version 1.14.0
-    pytest                version 7.2.1
-    pytest-django         version 4.5.2
-    python-dotenv         version 0.21.0
-    django-mysql          version 4.8.0
-    mysqlclient           version 2.1.1
+## Stack technologiczny
 
-Features
+| Warstwa       | Technologia                          |
+|---------------|--------------------------------------|
+| Backend       | Python 3.12, Django 4.1.5            |
+| Baza danych   | SQLite                               |
+| Formularze    | django-crispy-forms 1.14.0           |
+| Testy         | pytest 7.2.1, pytest-django 4.5.2    |
+| Konfiguracja  | python-dotenv 0.21.0                 |
+| Konteneryzacja| Docker, docker-compose               |
 
-List the ready features here:
+---
 
-    playing music files from the server in the browser
-    Comprehensive search for authors, songs, albums, playlists by whether their data contains the phrase the user is looking for
-    the ability to upload a music file with the creation of corresponding records
-    a library of favorite songs, authors, albums and playlists, which the user can freely modify
+## Szybki start
 
-Screenshots
+### Docker (zalecane)
 
-![obraz](https://user-images.githubusercontent.com/109000485/217674949-ddc894cd-0d88-4319-8607-20676b19126f.png)
-![obraz](https://user-images.githubusercontent.com/109000485/217675834-02f13451-bd99-42b4-ad0c-3987885a8f49.png)
+```bash
+docker compose up --build
+```
 
-Setup
+Aplikacja będzie dostępna pod adresem `http://localhost:8000`.
+Migracje uruchamiają się automatycznie przy starcie kontenera.
 
-The project's requirements are listed in the requirements.txt file, which is available in the project's root directory.
+### Lokalnie
 
-To deploy this project locally on your device, use the "python -m venv <name_env>" command in the desired directory.
-Then load the project requirements using the command: "pip install -r requirements.txt".
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
 
-Project Status
+---
 
-Project is: in progress.
-Room for Improvement
+## Konfiguracja `.env`
 
-Room for improvement:
+Utwórz plik `.env` w katalogu głównym projektu:
 
-    display of validation errors
-    better appearance of forms
+| Zmienna               | Opis                              | Domyślnie              |
+|-----------------------|-----------------------------------|------------------------|
+| `SECRET_KEY`          | Klucz Django                      | wartość deweloperska   |
+| `EMAIL_BACKEND`       | Backend poczty                    | `console`              |
+| `EMAIL_HOST`          | Serwer SMTP                       | —                      |
+| `EMAIL_PORT`          | Port SMTP                         | —                      |
+| `EMAIL_HOST_USER`     | Adres e-mail nadawcy              | —                      |
+| `EMAIL_HOST_PASSWORD` | Hasło do konta pocztowego         | —                      |
+| `DEFAULT_FROM_EMAIL`  | Adres „From" w wysyłanych mailach | `noreply@muzanaluzie.pl`|
 
-To do:
+---
 
-    display of details about the author, album
-    displaying the contents of albums and playlists
-    adding albums along with songs to the database in one go
-    display of song lyrics
-    adding a play queue
+## Testy
 
-Acknowledgements
+```bash
+docker compose run --rm web pytest
+```
 
-    This project was inspired by Youtube Music service.
-    Many thanks to Barbara Szema, for the support shown during the implementation of this project.
+---
 
-Contact
+## Struktura projektu
 
-Created by @Marcin-Ramotowski - feel free to contact me!
+```
+Apka-muzyczna/
+├── Apka_muzyczna/   # Konfiguracja projektu (settings, urls, wsgi)
+├── music/           # Główna aplikacja
+│   ├── models.py    # Modele danych
+│   ├── views.py     # Logika biznesowa
+│   ├── urls.py      # Routing
+│   ├── forms.py     # Formularze
+│   ├── tests.py     # Testy
+│   └── templates/   # Szablony HTML
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── FEATURES.md      # Szczegółowa lista funkcjonalności
+```
+
+---
+
+Stworzył [@Marcin-Ramotowski](https://github.com/Marcin-Ramotowski) — zainspirowany serwisem YouTube Music.
+
+Podziękowania dla Barbary Szema za wsparcie okazane podczas realizacji projektu.
