@@ -5,3 +5,4 @@ img
 media
 tekst
 *.sqlite3
+.mcp.json
